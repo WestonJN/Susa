@@ -4,6 +4,14 @@ Mobile-first quote-to-booking website for a South African moving and truck-trans
 React 19, TypeScript, Tailwind 4, Vite. Every page is prerendered to static HTML (SEO, fast on
 slow connections) and then hydrated.
 
+## Design documents (`docs/`)
+
+1. [Wireframe analysis and business model](docs/01-wireframe-analysis-and-business-model.md)
+2. [System and security architecture](docs/02-system-and-security-architecture.md) (POPIA, zero trust, audit)
+3. [Frontend technical specification](docs/03-frontend-technical-specification.md)
+4. [CEO Agent system prompt and guardrail protocol](docs/04-ceo-agent-system-prompt-and-guardrails.md)
+5. [API schema and event flow](docs/05-api-schema-and-event-flow.md) and [`docs/api/openapi.yaml`](docs/api/openapi.yaml)
+
 ## Develop
 
 ```bash
