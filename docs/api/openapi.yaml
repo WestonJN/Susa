@@ -1,0 +1,400 @@
+openapi: 3.1.0
+info:
+  title: Susa orchestrator gateway API
+  version: 1.0.0
+  description: |
+    Public and internal HTTP surface between the website, third-party webhooks, the Chairman console and the
+    AI orchestrator. All endpoints sit behind the API gateway (WAF, rate limits, schema validation).
+    Money is in ZAR whole rand. Timestamps are ISO 8601 in UTC. Placeholders: host names and limits.
+servers:
+  - url: https://api.example.co.za
+tags:
+  - name: Public
+    description: Called from the website. No login, protected by origin checks, rate limits and bot challenge.
+  - name: Webhooks
+    description: Called by providers. Signature verified, replay window enforced.
+  - name: Admin
+    description: Chairman console. SSO + MFA bearer token required.
+paths:
+  /v1/quote-requests:
+    post:
+      tags: [Public]
+      operationId: createQuoteRequest
+      summary: Submit a quote request from the website
+      description: |
+        Stores PII in the vault, creates a pseudonymous request, emits `quote.requested`. Never creates a booking.
+        Re-validates everything; the client estimate is advisory and is recomputed server-side.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 80 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteRequestV1" }
+      responses:
+        "202":
+          description: Accepted for processing.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/QuoteRequestAccepted" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "409":
+          description: Idempotency key reused with a different body.
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /v1/quote-requests/{reference}/status:
+    get:
+      tags: [Public]
+      operationId: getQuoteRequestStatus
+      summary: Customer-facing status of a request or job
+      description: Requires the unguessable `statusToken` returned at creation (sent in the status link). Returns no personal data.
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema: { type: string }
+        - name: token
+          in: query
+          required: true
+          schema: { type: string, minLength: 20 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StatusView" }
+          description: Current status.
+        "404":
+          description: Unknown reference or token.
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /v1/webhooks/whatsapp:
+    get:
+      tags: [Webhooks]
+      operationId: verifyWhatsappWebhook
+      summary: Provider verification handshake
+      parameters:
+        - { name: hub.mode, in: query, schema: { type: string } }
+        - { name: hub.verify_token, in: query, schema: { type: string } }
+        - { name: hub.challenge, in: query, schema: { type: string } }
+      responses:
+        "200": { description: Challenge echoed. }
+        "403": { description: Token mismatch. }
+    post:
+      tags: [Webhooks]
+      operationId: receiveWhatsappMessage
+      summary: Inbound WhatsApp message or status update
+      description: |
+        Must carry a valid `X-Hub-Signature-256` over the raw body. Message text is stored as untrusted data and
+        routed to the Lead Generation agent. Replies are drafted, then require approval before sending.
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        "200": { description: Acknowledged (always fast; processing is asynchronous). }
+        "401": { description: Bad signature. }
+  /v1/webhooks/payments:
+    post:
+      tags: [Webhooks]
+      operationId: receivePaymentEvent
+      summary: Payment provider notification (deposit paid, failed, refunded)
+      description: Provider signature verified. The server re-queries the provider for the final status before acting.
+      parameters:
+        - name: X-Signature
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PaymentEvent" }
+      responses:
+        "200": { description: Acknowledged. }
+        "401": { description: Bad signature. }
+  /v1/admin/approvals:
+    get:
+      tags: [Admin]
+      operationId: listApprovals
+      summary: List approval requests
+      security: [{ chairmanAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [pending, approved, rejected, expired, needs_info] }
+        - name: risk
+          in: query
+          schema: { type: string, enum: [low, medium, high] }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: A page of approval requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/ApprovalRequest" }
+                  nextCursor: { type: [string, "null"] }
+  /v1/admin/approvals/{id}/decision:
+    post:
+      tags: [Admin]
+      operationId: decideApproval
+      summary: Approve, reject or request more information
+      description: |
+        High-risk items require an MFA step-up claim in the token. Approving a booking atomically takes the
+        capacity lock. Edits create a new version; the original is kept.
+      security: [{ chairmanAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: Idempotency-Key, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ApprovalDecision" }
+      responses:
+        "200":
+          description: Decision recorded.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalRequest" }
+        "403": { description: Step-up authentication required. }
+        "409": { description: Item expired, already decided, or capacity lock lost. }
+  /v1/admin/audit-events:
+    get:
+      tags: [Admin]
+      operationId: listAuditEvents
+      summary: Query the audit log
+      security: [{ chairmanAuth: [] }]
+      parameters:
+        - { name: correlationId, in: query, schema: { type: string } }
+        - { name: actor, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Audit events (read-only).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/AuditEvent" }
+                  nextCursor: { type: [string, "null"] }
+  /v1/admin/agents/{agent}/pause:
+    post:
+      tags: [Admin]
+      operationId: pauseAgent
+      summary: Kill switch for one agent (use `all` to pause everything)
+      security: [{ chairmanAuth: [] }]
+      parameters:
+        - name: agent
+          in: path
+          required: true
+          schema: { type: string, enum: [all, ceo, lead_generation, quoting, dispatch, support] }
+      responses:
+        "204": { description: Paused. Queued work is preserved. }
+components:
+  securitySchemes:
+    chairmanAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: SSO-issued token with MFA claim. Short-lived.
+  responses:
+    ValidationError:
+      description: Request failed schema or business validation.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: Too many requests. Honour `Retry-After`.
+      headers:
+        Retry-After: { schema: { type: integer } }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, examples: [validation_failed] }
+        message: { type: string }
+        fields:
+          type: object
+          additionalProperties: { type: string }
+    QuoteRequestV1:
+      type: object
+      description: Mirrors `QuoteRequestV1` in `src/lib/api.ts`.
+      required: [schemaVersion, idempotencyKey, route, load, schedule, options, estimate, contact, consent, website]
+      additionalProperties: false
+      properties:
+        schemaVersion: { const: 1 }
+        idempotencyKey: { type: string, minLength: 8, maxLength: 80 }
+        route:
+          type: object
+          required: [pickup, dropoff, distanceKm, tollEstimate]
+          additionalProperties: false
+          properties:
+            pickup: { type: string, minLength: 5, maxLength: 200 }
+            dropoff: { type: string, minLength: 5, maxLength: 200 }
+            distanceKm: { type: number, exclusiveMinimum: 0, maximum: 2000 }
+            tollEstimate: { type: number, minimum: 0, maximum: 99999 }
+        load:
+          type: object
+          required: [vehicleId, tier, trips, helpers, floors, volumeM3, items]
+          additionalProperties: false
+          properties:
+            vehicleId: { type: string, enum: [bakkie, t1_5, t4, t8] }
+            tier: { type: string, enum: [transport, loading, full] }
+            trips: { type: integer, minimum: 1, maximum: 10 }
+            helpers: { type: integer, minimum: 0, maximum: 10 }
+            floors: { type: integer, minimum: 0, maximum: 20 }
+            volumeM3: { type: [number, "null"], minimum: 0 }
+            items:
+              type: object
+              additionalProperties: { type: integer, minimum: 1, maximum: 99 }
+        schedule:
+          type: object
+          required: [date, window]
+          additionalProperties: false
+          properties:
+            date: { type: string, format: date }
+            window: { type: string, maxLength: 60 }
+        options:
+          type: object
+          required: [goodsInTransitCoverRequested]
+          additionalProperties: false
+          properties:
+            goodsInTransitCoverRequested: { type: boolean }
+        estimate:
+          type: object
+          description: Client estimate, advisory only. The server recomputes.
+          required: [total, status, confidence, reasons]
+          additionalProperties: false
+          properties:
+            total: { type: number, minimum: 0 }
+            status: { type: string, enum: [incomplete, ready, needs_review] }
+            confidence: { type: number, minimum: 0, maximum: 1 }
+            reasons:
+              type: array
+              items: { type: string, maxLength: 300 }
+              maxItems: 10
+        contact:
+          type: object
+          required: [name, phone, email]
+          additionalProperties: false
+          properties:
+            name: { type: string, minLength: 2, maxLength: 100 }
+            phone: { type: string, pattern: "^\\+27[0-9]{9}$" }
+            email: { type: [string, "null"], format: email, maxLength: 254 }
+        consent:
+          type: object
+          required: [privacyNoticeVersion, acceptedAt]
+          additionalProperties: false
+          properties:
+            privacyNoticeVersion: { type: string }
+            acceptedAt: { type: string, format: date-time }
+        website:
+          type: string
+          maxLength: 0
+          description: Honeypot. Must be empty; requests with a value are silently dropped.
+    QuoteRequestAccepted:
+      type: object
+      required: [reference, statusToken]
+      properties:
+        reference: { type: string, examples: [Q-7K3F9] }
+        statusToken: { type: string, description: Unguessable token for the status endpoint. }
+    StatusView:
+      type: object
+      required: [reference, stage, updatedAt]
+      properties:
+        reference: { type: string }
+        stage:
+          type: string
+          enum: [received, being_priced, awaiting_confirmation, confirmed, driver_assigned, en_route, loading, in_transit, delivered, completed, cancelled]
+        message: { type: string, description: Approved, human-written text only. }
+        eta: { type: [string, "null"], format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PaymentEvent:
+      type: object
+      required: [providerEventId, type, bookingReference, amount]
+      properties:
+        providerEventId: { type: string }
+        type: { type: string, enum: [deposit.paid, deposit.failed, refund.completed] }
+        bookingReference: { type: string }
+        amount: { type: number, minimum: 0 }
+    ApprovalRequest:
+      type: object
+      required: [id, type, risk, summary, recommendation, confidence, status, expiresAt]
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string, enum: [booking, price_override, customer_message, payout, config_change, data_disclosure] }
+        risk: { type: string, enum: [low, medium, high] }
+        summary: { type: string }
+        recommendation: { type: string, enum: [approve, reject, needs_info] }
+        reasoning: { type: array, items: { type: string } }
+        confidence: { type: number, minimum: 0, maximum: 1 }
+        numbers:
+          type: object
+          additionalProperties: true
+        customerRef: { type: string, description: Pseudonymous ID. }
+        draft: { type: [string, "null"] }
+        alternatives: { type: array, items: { type: string } }
+        status: { type: string, enum: [pending, approved, rejected, expired, needs_info] }
+        version: { type: integer, minimum: 1 }
+        expiresAt: { type: string, format: date-time }
+    ApprovalDecision:
+      type: object
+      required: [decision]
+      properties:
+        decision: { type: string, enum: [approve, reject, needs_info] }
+        note: { type: string, maxLength: 1000 }
+        edits:
+          type: object
+          description: Optional edited values (for example a changed price or message text). Creates a new version.
+          additionalProperties: true
+    AuditEvent:
+      type: object
+      required: [id, at, correlationId, actor, action]
+      properties:
+        id: { type: string }
+        at: { type: string, format: date-time }
+        correlationId: { type: string }
+        actor: { type: string, description: "Agent role or human id, e.g. agent:quoting or human:chairman." }
+        action: { type: string, examples: [quote.priced] }
+        ruleApplied: { type: [string, "null"] }
+        confidence: { type: [number, "null"] }
+        summary: { type: string, description: Pseudonymised input and output summary. }
+        prevHash: { type: string }
+        hash: { type: string }
+    EventEnvelope:
+      type: object
+      description: Internal bus message format. Not an HTTP endpoint; documented here for one source of truth.
+      required: [id, type, schemaVersion, correlationId, actor, occurredAt, payload, signature]
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string, examples: [quote.requested] }
+        schemaVersion: { type: integer }
+        correlationId: { type: string }
+        causationId: { type: string }
+        actor: { type: string }
+        occurredAt: { type: string, format: date-time }
+        payload: { type: object, additionalProperties: true }
+        signature: { type: string, description: HMAC or JWT from the sending service identity. }
