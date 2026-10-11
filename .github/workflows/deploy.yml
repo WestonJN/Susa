@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Build
+        run: npm run build
+        env:
+          # Set these under Settings > Secrets and variables > Actions > Variables.
+          VITE_SITE_URL: ${{ vars.SITE_URL }}
+          VITE_BASE: ${{ vars.SITE_BASE || '/' }}
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          VITE_SITE_NAME: ${{ vars.SITE_NAME || 'Susa' }}
+          VITE_WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
+          VITE_PHONE: ${{ vars.PHONE }}
+          VITE_CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+          VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
+          VITE_VAT_REGISTERED: ${{ vars.VAT_REGISTERED || 'false' }}
+          VITE_GSC_VERIFICATION: ${{ vars.GSC_VERIFICATION }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

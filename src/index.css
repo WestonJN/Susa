@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* System font stack on purpose: no web-font download on constrained mobile data. */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-brand-50: #eef5fb;
+  --color-brand-100: #d6e6f4;
+  --color-brand-500: #1d5f94;
+  --color-brand-600: #174d79;
+  --color-brand-700: #123e61;
+  --color-brand-900: #0f2a43;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+dialog::backdrop {
+  background: rgb(15 42 67 / 0.6);
+}
