@@ -10,7 +10,7 @@ export const site = {
   tagline: "Furniture removals and truck transport across Gauteng",
   description:
     "Get an instant online quote for furniture removals, home moves and truck transport in Johannesburg, Pretoria and across Gauteng. Choose your truck, see the price build up, and book with confidence.",
-  url: ((env.VITE_SITE_URL as string | undefined) ?? "https://www.example.co.za").replace(/\/$/, ""),
+  url: (((env.VITE_SITE_URL as string | undefined) || "https://www.example.co.za").replace(/\/$/, "") + String(env.BASE_URL).replace(/\/$/, "")),
   locale: "en_ZA",
   phone: (env.VITE_PHONE as string | undefined) ?? "",
   whatsapp: ((env.VITE_WHATSAPP_NUMBER as string | undefined) ?? "").replace(/\D/g, ""),
