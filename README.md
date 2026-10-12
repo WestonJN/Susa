@@ -11,6 +11,7 @@ slow connections) and then hydrated.
 3. [Frontend technical specification](docs/03-frontend-technical-specification.md)
 4. [CEO Agent system prompt and guardrail protocol](docs/04-ceo-agent-system-prompt-and-guardrails.md)
 5. [API schema and event flow](docs/05-api-schema-and-event-flow.md) and [`docs/api/openapi.yaml`](docs/api/openapi.yaml)
+6. [How it works today: built vs designed, calculations, next steps](docs/06-how-it-works-today.md)
 
 ## Develop
 
@@ -42,6 +43,7 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 | `API_BASE_URL` | `https://api.yourdomain.co.za` | Orchestrator gateway. Empty = the form falls back to WhatsApp/email. |
 | `VAT_REGISTERED` | `true` / `false` | Adds a VAT line to quotes. |
 | `GSC_VERIFICATION` | | Optional Search Console meta token. |
+| `GOOGLE_MAPS_API_KEY` | | Optional. Switches address search to Google Places (New). Enable *Places API (New)*, restrict the key to HTTP referrer `https://westonjn.github.io/*`, cap the daily quota. Without it the free Photon service is used. |
 
 `ci.yml` runs typecheck, tests and a build on pull requests and non-main branches.
 
@@ -61,10 +63,9 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 ## What is a placeholder
 
 - **All rates** in `src/lib/catalog.ts` (fleet fees, per-km, crew, floors, packing, floors/ceilings). Set them before launch.
-- **Trailer size** (`TRAILER_M3` in `src/lib/catalog.ts`) is assumed at 2.2 m³. Measure your trailer and update it; the H1 van uses the published 4.3 m³ panel-van figure. The 1.5/4/8 ton classes are scaled up from there and shown as "subject to availability".
-- **Address search** uses the free Photon (OpenStreetMap) and OSRM public services, limited to Johannesburg. Fine for launch; move to a paid provider behind the gateway as traffic grows.
+- **Bakkie deck and trailer size** (`BAKKIE_DECK`, `TRAILER_BOX` in `src/lib/catalog.ts`) are assumptions for a Hyundai H100 dropside and a closed medium trailer. Measure yours and update them; capacities follow automatically.
+- **Address search** uses free Photon (OpenStreetMap) and OSRM, limited to Johannesburg, unless `GOOGLE_MAPS_API_KEY` is set (then Google Places). The Google path is only tested against mocks.
 - Brand name "Susa", legal wording in `src/pages/Legal.tsx` (have a lawyer review for POPIA and consumer-law fit).
-- Distance is entered by the customer. Replace with a maps/routing lookup behind the gateway.
 - `POST {API_BASE_URL}/v1/quote-requests` contract is typed in `src/lib/api.ts`; the gateway is not built yet.
 
 ## Guardrails built into the quote engine

@@ -45,7 +45,7 @@ export function LoadAssistant({
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           <p className="py-3 text-sm text-slate-600">
-            Add what you are moving and we will suggest a truck. This is optional, and your quote only changes when you apply the suggestion.
+            Add what you are moving and we will suggest the bakkie or the bakkie with a trailer. This is optional, and your quote only changes when you apply the suggestion.
           </p>
           {itemGroups.map((g) => (
             <fieldset key={g.id} className="mb-4 rounded-xl border border-slate-200 px-3 pb-2">
@@ -77,7 +77,7 @@ export function LoadAssistant({
               <dd className="font-semibold">{rec.helpers}</dd>
             </div>
           </dl>
-          {rec.trips > 1 && <p className="mb-2 text-sm text-amber-700">This load needs about {rec.trips} trips with our largest truck.</p>}
+          {rec.trips > 1 && <p className="mb-2 text-sm text-amber-700">This load needs about {rec.trips} trips with the bakkie and trailer.</p>}
           <Button className="w-full" disabled={!vehicle} onClick={() => onApply(rec)}>
             Apply suggestion
           </Button>

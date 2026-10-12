@@ -3,7 +3,7 @@ import { calculateQuote, type QuoteInput } from "./pricing";
 import { recommendLoad, vehicles } from "./catalog";
 
 const base: QuoteInput = {
-  vehicleId: "t1_5",
+  vehicleId: "h100_trailer",
   tier: "transport",
   distanceKm: 20,
   tollEstimate: 0,
@@ -25,12 +25,12 @@ describe("calculateQuote", () => {
   it("builds a ready quote from base fee + distance", () => {
     const q = calculateQuote(base);
     expect(q.status).toBe("ready");
-    expect(q.total).toBe(870); // 650 + 11*20
+    expect(q.total).toBe(750); // 550 + 10*20
     expect(q.reasons).toEqual([]);
   });
 
   it("never goes below the hard price floor", () => {
-    const q = calculateQuote({ ...base, vehicleId: "h1", distanceKm: 1 });
+    const q = calculateQuote({ ...base, vehicleId: "h100", distanceKm: 1 });
     expect(q.subtotal).toBe(600);
   });
 
@@ -41,13 +41,18 @@ describe("calculateQuote", () => {
   });
 
   it("routes quotes above the automatic ceiling to a human", () => {
-    const q = calculateQuote({ ...base, vehicleId: "h1", distanceKm: 400, trips: 3 });
+    const q = calculateQuote({ ...base, vehicleId: "h100", distanceKm: 400, trips: 3 });
     expect(q.status).toBe("needs_review");
     expect(q.confidence).toBeLessThanOrEqual(0.5);
   });
 
+  it("sends moves needing many trips to a person", () => {
+    expect(calculateQuote({ ...base, trips: 3 }).status).toBe("ready");
+    expect(calculateQuote({ ...base, trips: 4 }).status).toBe("needs_review");
+  });
+
   it("flags inventory that cannot fit", () => {
-    const q = calculateQuote({ ...base, vehicleId: "h1", volumeM3: 20 });
+    const q = calculateQuote({ ...base, vehicleId: "h100", volumeM3: 20 });
     expect(q.status).toBe("needs_review");
   });
 
@@ -73,18 +78,20 @@ describe("recommendLoad", () => {
     expect(recommendLoad({}).vehicleId).toBeNull();
   });
 
-  it("sizes the first two classes from the Hyundai H1 van and trailer", () => {
-    const h1 = vehicles.find((v) => v.id === "h1")!;
-    const combo = vehicles.find((v) => v.id === "h1_trailer")!;
-    expect(h1.capacityM3).toBe(4.3);
-    expect(combo.capacityM3).toBeGreaterThan(h1.capacityM3);
-    expect(combo.capacityM3).toBeLessThan(vehicles.find((v) => v.id === "t1_5")!.capacityM3);
+  it("sizes the two classes from the H100 bakkie and trailer", () => {
+    const bk = vehicles.find((v) => v.id === "h100")!;
+    const combo = vehicles.find((v) => v.id === "h100_trailer")!;
+    expect(bk.capacityM3).toBe(2.9);
+    expect(combo.capacityM3).toBeGreaterThan(bk.capacityM3);
+    expect(vehicles).toHaveLength(2);
   });
 
   it("picks the smallest vehicle that fits", () => {
-    expect(recommendLoad({ "box-medium": 5 }).vehicleId).toBe("h1");
-    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1 }).vehicleId).toBe("h1_trailer");
-    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1, "wardrobe-large": 1 }).vehicleId).toBe("t1_5");
+    expect(recommendLoad({ "box-medium": 5 }).vehicleId).toBe("h100");
+    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1 }).vehicleId).toBe("h100_trailer");
+    const bigger = recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1, "wardrobe-large": 1 });
+    expect(bigger.vehicleId).toBe("h100_trailer");
+    expect(bigger.trips).toBe(2);
   });
 
   it("uses multiple trips when the biggest truck is not enough", () => {

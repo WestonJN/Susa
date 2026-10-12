@@ -29,7 +29,7 @@ export function Privacy() {
         </section>
         <section>
           <h2 className="text-xl font-bold text-brand-900">Address search</h2>
-          <p>When you type an address on the quote form, the text you type is sent to an address-search service built on OpenStreetMap data (Photon), and the two coordinates you pick are sent to a routing service (OSRM) to work out the driving distance. Your name, phone number and email are not sent to these services.</p>
+          <p>When you type an address on the quote form, the text you type is sent to an address-search service (Google Places when enabled, otherwise the OpenStreetMap-based Photon service), and the coordinates of the two addresses you pick are sent to a routing service (OSRM) to work out the driving distance. Your name, phone number and email are not sent to these services.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-brand-900">Automated assistance</h2>

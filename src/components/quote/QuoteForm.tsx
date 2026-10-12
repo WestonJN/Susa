@@ -9,7 +9,7 @@ import { whatsappLink } from "../Layout";
 import { href } from "../../lib/url";
 import { LoadAssistant } from "./LoadAssistant";
 import { AddressSearch } from "./AddressSearch";
-import { routeDistanceKm, type Place } from "../../lib/geo";
+import { quickDistanceKm, routeDistanceKm, type Place } from "../../lib/geo";
 
 const STEPS = ["Route", "Truck", "Move details", "When", "Review"] as const;
 const WINDOWS = ["Early morning (06:00 to 09:00)", "Morning (09:00 to 12:00)", "Afternoon (12:00 to 16:00)", "Flexible"] as const;
@@ -92,7 +92,6 @@ export function QuoteForm() {
   const [reference, setReference] = useState("");
   const [minDate, setMinDate] = useState("");
   const [key] = useState(newIdempotencyKey);
-  const [routing, setRouting] = useState(false);
   const [routeNote, setRouteNote] = useState("");
   const [distanceAuto, setDistanceAuto] = useState(false);
 
@@ -108,17 +107,17 @@ export function QuoteForm() {
       return;
     }
     let cancelled = false;
-    setRouting(true);
+    // Show an instant straight-line estimate, then replace it with the real road distance.
+    setS((prev) => ({ ...prev, distanceKm: String(quickDistanceKm(pickupPlace, dropoffPlace)) }));
+    setDistanceAuto(true);
+    setRouteNote("Estimate from the map. Checking the road distance…");
     routeDistanceKm(pickupPlace, dropoffPlace).then((r) => {
       if (cancelled) return;
       setS((prev) => ({ ...prev, distanceKm: String(r.km) }));
-      setDistanceAuto(true);
-      setRouteNote(r.estimated ? "Estimated from the map (routing was unavailable). Please check it." : "Driving distance between your two addresses.");
-      setRouting(false);
+      setRouteNote(r.estimated ? "Estimated from the map (road routing was unavailable). Please check it." : "Driving distance between your two addresses.");
     });
     return () => {
       cancelled = true;
-      setRouting(false);
     };
   }, [s.pickupPlace, s.dropoffPlace]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -310,7 +309,7 @@ export function QuoteForm() {
                 label="Driving distance (km)"
                 htmlFor="km"
                 error={errors.distanceKm}
-                hint={routing ? "Working out the distance…" : distanceAuto ? routeNote : "Filled in automatically once both addresses are picked. You can also type it."}
+                hint={distanceAuto ? routeNote : "Filled in automatically once both addresses are picked. You can also type it."}
               >
                 <input
                   id="km"
@@ -343,7 +342,6 @@ export function QuoteForm() {
                     <div className="text-sm text-slate-500">{veh.tonnage}</div>
                     <p className="mt-1 text-sm text-slate-700">{veh.bestFor}</p>
                     <p className="mt-2 text-xs font-medium text-slate-500">{veh.spec}</p>
-                    {veh.onRequest && <p className="mt-1 text-xs font-semibold text-amber-700">Subject to availability, confirmed when you book</p>}
                   </label>
                 ))}
               </div>

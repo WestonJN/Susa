@@ -5,7 +5,7 @@
  * They exist so the quote flow, guardrails and tests are real. Prices are ZAR.
  */
 
-export type VehicleId = "h1" | "h1_trailer" | "t1_5" | "t4" | "t8";
+export type VehicleId = "h100" | "h100_trailer";
 export type TierId = "transport" | "loading" | "full";
 
 export interface Vehicle {
@@ -23,84 +23,44 @@ export interface Vehicle {
   minCharge: number;
   /** Hard ceiling: automatic quotes above this go to a human. */
   maxAutoQuote: number;
-  /** false = our own vehicle today; true = larger class, availability confirmed on booking. */
-  onRequest: boolean;
 }
 
 /**
- * Sizing is anchored on the vehicle we run today: a Hyundai H1 panel van (published SA spec:
- * 4.3 m³ load space, 1 100 kg payload, 2.4 m cargo bay, 1 500 kg towing) plus a trailer.
- * TRAILER_M3 is an ASSUMPTION (about 2.4 m x 1.3 m x 0.7 m): measure the real trailer and update it.
- * Larger classes are scaled up from there and are marked "on request".
+ * Sizing is anchored on the vehicle we run today: a Hyundai H100 dropside bakkie plus a closed
+ * medium trailer. These dimensions are ASSUMPTIONS (typical for the class), not measurements:
+ * measure the real deck and trailer and change the numbers below. Everything else follows.
+ * Add bigger classes here only when you actually own or partner for them.
  */
-export const H1_VAN_M3 = 4.3;
-export const TRAILER_M3 = 2.2;
+export const BAKKIE_DECK = { lengthM: 2.3, widthM: 1.6, loadHeightM: 0.8 } as const;
+export const TRAILER_BOX = { lengthM: 2.4, widthM: 1.3, heightM: 1.0 } as const;
+const round1 = (n: number) => Math.round(n * 10) / 10;
+export const H100_M3 = round1(BAKKIE_DECK.lengthM * BAKKIE_DECK.widthM * BAKKIE_DECK.loadHeightM);
+export const TRAILER_M3 = round1(TRAILER_BOX.lengthM * TRAILER_BOX.widthM * TRAILER_BOX.heightM);
 
 export const vehicles: readonly Vehicle[] = [
   {
-    id: "h1",
-    name: "Hyundai H1 van",
-    tonnage: "Up to 1.1 ton",
-    bestFor: "A few items, a student room or a one-room move. Closed van, so your things stay protected.",
-    spec: "Closed van: about 4.3 m³ load space, 2.4 m long",
-    capacityM3: H1_VAN_M3,
+    id: "h100",
+    name: "Hyundai H100 bakkie",
+    tonnage: "Up to 1 ton",
+    bestFor: "A few items, a student room or large appliances. Open dropside, so tall and awkward items load easily.",
+    spec: `Open dropside: about ${H100_M3} m³ of load space`,
+    capacityM3: H100_M3,
     baseFee: 450,
     perKm: 9,
     minCharge: 600,
     maxAutoQuote: 3500,
-    onRequest: false,
   },
   {
-    id: "h1_trailer",
-    name: "Hyundai H1 + trailer",
-    tonnage: "Van plus trailer",
-    bestFor: "Bachelor flats and small one-bedroom homes, or bulkier items that need the extra space.",
-    spec: `Van plus trailer: about ${(H1_VAN_M3 + TRAILER_M3).toFixed(1)} m³ in total`,
-    capacityM3: H1_VAN_M3 + TRAILER_M3,
+    id: "h100_trailer",
+    name: "H100 bakkie + trailer",
+    tonnage: "Bakkie plus trailer",
+    bestFor: "One-bedroom homes and bulky furniture. The closed trailer is specifically designed for furniture transport and keeps it dry.",
+    spec: `Bakkie plus closed trailer: about ${(H100_M3 + TRAILER_M3).toFixed(1)} m³ in total`,
+    capacityM3: H100_M3 + TRAILER_M3,
     baseFee: 550,
     perKm: 10,
     minCharge: 750,
     maxAutoQuote: 4000,
-    onRequest: false,
-  },
-  {
-    id: "t1_5",
-    name: "1.5 ton truck",
-    tonnage: "1.5 ton",
-    bestFor: "One to two bedroom homes and larger apartments.",
-    spec: "Closed truck: about 8 m³ load space",
-    capacityM3: 8,
-    baseFee: 650,
-    perKm: 11,
-    minCharge: 850,
-    maxAutoQuote: 5000,
-    onRequest: true,
-  },
-  {
-    id: "t4",
-    name: "4 ton closed truck",
-    tonnage: "4 ton",
-    bestFor: "Two to three bedroom homes and small offices.",
-    spec: "Closed truck: about 22 m³ load space",
-    capacityM3: 22,
-    baseFee: 1400,
-    perKm: 16,
-    minCharge: 1800,
-    maxAutoQuote: 9000,
-    onRequest: true,
-  },
-  {
-    id: "t8",
-    name: "8 ton closed truck",
-    tonnage: "8 ton",
-    bestFor: "Full family homes, offices and big commercial moves.",
-    spec: "Closed truck: about 38 m³ load space",
-    capacityM3: 38,
-    baseFee: 2800,
-    perKm: 24,
-    minCharge: 3500,
-    maxAutoQuote: 16000,
-    onRequest: true,
   },
 ] as const;
 
@@ -153,6 +113,8 @@ export const rates = {
   loadEfficiency: 0.85,
   /** Confidence below this routes the quote to a human. */
   autoApproveConfidence: 0.8,
+  /** More trips than this and a person confirms the plan (big moves with a small van). */
+  maxAutoTrips: 3,
   /** Beyond this road distance the route is treated as outside Johannesburg and priced by a person. */
   longDistanceKm: 60,
   maxFloors: 4,

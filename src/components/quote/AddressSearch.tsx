@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { searchPlaces, type Place } from "../../lib/geo";
+import { newSessionToken, resolveSuggestion, searchSuggestions, type Place, type Suggestion } from "../../lib/geo";
 import { inputClass } from "../ui";
 
 interface Props {
@@ -16,12 +16,14 @@ interface Props {
 /** Accessible address combobox: type, pick a suggestion, or keep what you typed. Johannesburg only. */
 export function AddressSearch({ id, label, value, place, placeholder, error, onText, onPlace }: Props) {
   const listId = useId();
-  const [results, setResults] = useState<Place[]>([]);
+  const [results, setResults] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [resolveFailed, setResolveFailed] = useState(false);
+  const token = useRef<string>("");
   const timer = useRef<number | undefined>(undefined);
   const ctrl = useRef<AbortController | null>(null);
 
@@ -36,6 +38,7 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
   function input(text: string) {
     onText(text);
     onPlace(null);
+    setResolveFailed(false);
     window.clearTimeout(timer.current);
     setActive(-1);
     if (text.trim().length < 3) {
@@ -52,7 +55,8 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
       ctrl.current = c;
       setLoading(true);
       try {
-        const found = await searchPlaces(text.trim(), c.signal);
+        if (!token.current) token.current = newSessionToken();
+        const found = await searchSuggestions(text.trim(), token.current, c.signal);
         setResults(found);
         setFailed(false);
         setSearched(true);
@@ -67,15 +71,23 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
       } finally {
         if (ctrl.current === c) setLoading(false);
       }
-    }, 350);
+    }, 200);
   }
 
-  function choose(p: Place) {
-    onText(p.label);
-    onPlace(p);
+  async function choose(s: Suggestion) {
+    onText(s.label);
     setOpen(false);
     setResults([]);
     setActive(-1);
+    setLoading(true);
+    try {
+      onPlace(await resolveSuggestion(s, token.current));
+      token.current = newSessionToken(); // a new billing session starts after each pick
+    } catch {
+      setResolveFailed(true);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function key(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -95,7 +107,9 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
   }
 
   const showPanel = open && searched && !loading;
-  const status = place
+  const status = resolveFailed
+    ? "We could not locate that address. Try another suggestion, or type the distance yourself"
+    : place
     ? "Address found on the map"
     : loading
       ? "Searching…"

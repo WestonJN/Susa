@@ -263,7 +263,7 @@ components:
           required: [vehicleId, tier, trips, helpers, floors, volumeM3, items]
           additionalProperties: false
           properties:
-            vehicleId: { type: string, enum: [h1, h1_trailer, t1_5, t4, t8] }
+            vehicleId: { type: string, enum: [h100, h100_trailer] }
             tier: { type: string, enum: [transport, loading, full] }
             trips: { type: integer, minimum: 1, maximum: 10 }
             helpers: { type: integer, minimum: 0, maximum: 10 }

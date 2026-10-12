@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildLabel, haversineKm, inJohannesburg, parsePhoton } from "./geo";
+import { buildLabel, haversineKm, inJohannesburg, parseGoogleAutocomplete, parseGoogleDetails, parsePhoton, quickDistanceKm } from "./geo";
 
 describe("inJohannesburg", () => {
   it("accepts Johannesburg suburbs and rejects other cities", () => {
@@ -46,5 +46,37 @@ describe("parsePhoton", () => {
   it("returns an empty list for junk", () => {
     expect(parsePhoton(null)).toEqual([]);
     expect(parsePhoton({ features: "x" })).toEqual([]);
+  });
+});
+
+describe("labels", () => {
+  it("drops OpenStreetMap ward noise like 'Johannesburg Ward 70'", () => {
+    expect(buildLabel({ street: "1st Street", district: "Johannesburg Ward 70", suburb: "Northcliff", city: "Johannesburg" })).toBe("1st Street, Northcliff, Johannesburg");
+    expect(buildLabel({ street: "1st Street", district: "Johannesburg Ward 70", city: "Johannesburg", postcode: "1712" })).toBe("1st Street, Johannesburg, 1712");
+  });
+});
+
+describe("Google Places parsing", () => {
+  it("reads suggestions and strips the country", () => {
+    const out = parseGoogleAutocomplete({
+      suggestions: [
+        { placePrediction: { placeId: "abc", text: { text: "12 Jan Smuts Avenue, Parktown, Johannesburg, South Africa" } } },
+        { queryPrediction: { text: { text: "ignored" } } },
+      ],
+    });
+    expect(out).toEqual([{ label: "12 Jan Smuts Avenue, Parktown, Johannesburg", placeId: "abc" }]);
+    expect(parseGoogleAutocomplete({})).toEqual([]);
+  });
+  it("reads coordinates from place details", () => {
+    expect(parseGoogleDetails({ location: { latitude: -26.17, longitude: 28.04 } })).toEqual({ lat: -26.17, lon: 28.04 });
+    expect(parseGoogleDetails({})).toBeNull();
+  });
+});
+
+describe("quickDistanceKm", () => {
+  it("is a road-factor estimate and never below 1 km", () => {
+    const a = { label: "a", lat: -26.1076, lon: 28.0567 };
+    expect(quickDistanceKm(a, { label: "b", lat: -26.2041, lon: 28.0473 })).toBeGreaterThan(13);
+    expect(quickDistanceKm(a, a)).toBe(1);
   });
 });

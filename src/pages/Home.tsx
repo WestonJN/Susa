@@ -6,7 +6,7 @@ import { Container, LinkButton, Section } from "../components/ui";
 
 const steps = [
   { t: "Search your addresses", d: "Type the pick-up and drop-off and pick them from the list. We work out the distance for you." },
-  { t: "Choose your truck", d: "Pick a size, or add your furniture and let the load assistant suggest one." },
+  { t: "Choose your vehicle", d: "Pick the bakkie or bakkie with trailer, or add your furniture and let the load assistant suggest one." },
   { t: "See the price build up", d: "Distance, crew, stairs and tolls are itemised as you go." },
   { t: "We confirm your booking", d: "A real person checks availability and your final price before anything is locked in." },
 ];
@@ -54,7 +54,7 @@ export function Home() {
         </ol>
       </Section>
 
-      <Section title="The right truck for every move" intro="From a few boxes to a full household, pick the size that fits.">
+      <Section title="Our vehicles" intro="A closed Hyundai H1 van, or the van with a trailer for bigger loads. Large moves are done in several trips.">
         <ul className="grid gap-4 sm:grid-cols-2">
           {vehicles.map((v) => (
             <li key={v.id} className="rounded-2xl border border-slate-200 bg-white p-5">

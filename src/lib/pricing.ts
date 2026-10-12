@@ -97,6 +97,10 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     confidence -= 0.4;
     reasons.push("Your inventory may not fit the selected truck and trips.");
   }
+  if (trips > rates.maxAutoTrips) {
+    confidence -= 0.3;
+    reasons.push("A move this big needs several trips, so our team will confirm the plan with you.");
+  }
   if (floors > rates.maxFloors) {
     confidence -= 0.2;
     reasons.push("Access with many floors needs a quick manual check.");

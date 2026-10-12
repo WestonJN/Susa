@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 # Works with no domain and no settings: the site is published at
 #   https://<owner>.github.io/<repo>/
 # Optional repository Variables (Settings > Secrets and variables > Actions > Variables):
-#   CUSTOM_DOMAIN, SITE_NAME, WHATSAPP_NUMBER, PHONE, CONTACT_EMAIL, API_BASE_URL, VAT_REGISTERED, GSC_VERIFICATION
+#   GOOGLE_MAPS_API_KEY, CUSTOM_DOMAIN, SITE_NAME, WHATSAPP_NUMBER, PHONE, CONTACT_EMAIL, API_BASE_URL, VAT_REGISTERED, GSC_VERIFICATION
 
 on:
   push:
@@ -69,6 +69,7 @@ jobs:
           VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
           VITE_VAT_REGISTERED: ${{ vars.VAT_REGISTERED || 'false' }}
           VITE_GSC_VERIFICATION: ${{ vars.GSC_VERIFICATION }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ vars.GOOGLE_MAPS_API_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

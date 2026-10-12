@@ -60,4 +60,8 @@ writeFileSync(join(dist, ".nojekyll"), "");
 if (process.env.CUSTOM_DOMAIN) writeFileSync(join(dist, "CNAME"), `${process.env.CUSTOM_DOMAIN.trim()}\n`);
 if (!existsSync(join(dist, "404.html"))) copyFileSync(join(dist, "index.html"), join(dist, "404.html"));
 
+if (!process.env.VITE_API_BASE_URL && !process.env.VITE_WHATSAPP_NUMBER && !process.env.VITE_CONTACT_EMAIL) {
+  console.warn("::warning title=Quote requests have nowhere to go::No API_BASE_URL, WHATSAPP_NUMBER or CONTACT_EMAIL is set, so a customer who finishes the form has no way to send it to you. Add the WHATSAPP_NUMBER (and/or CONTACT_EMAIL) repository variable.");
+}
+
 console.log(`Prerendered ${bundle.pages.length} pages, ${urls.length} in sitemap.`);
