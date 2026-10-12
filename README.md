@@ -30,7 +30,7 @@ canonical tag, sitemap entry and asset path to match.
 
 1. Make sure `.github/workflows/deploy.yml` is in the repo. The GitHub web uploader skips hidden folders, so
    add it with **Add file > Create new file**, name it `.github/workflows/deploy.yml`, and paste the contents.
-2. **Settings > Pages > Build and deployment > Source: GitHub Actions** (the workflow also tries to switch this on itself).
+2. **Settings > Pages > Build and deployment > Source: GitHub Actions** (required, one time: the workflow cannot switch Pages on by itself).
 3. Push to `main` (or run **Actions > Deploy to GitHub Pages > Run workflow**). The first run takes about two minutes.
 
 Optional repository Variables (Settings > Secrets and variables > Actions > Variables), all safe to add later:
