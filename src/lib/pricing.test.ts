@@ -100,3 +100,12 @@ describe("recommendLoad", () => {
     expect(r.trips).toBeGreaterThan(1);
   });
 });
+
+describe("fleet showcase example loads", () => {
+  it("fit the vehicle they are shown against", async () => {
+    const { bakkieLoad, comboLoad } = await import("../components/fleet/FleetShowcase");
+    expect(recommendLoad(bakkieLoad).vehicleId).toBe("h100");
+    expect(recommendLoad(comboLoad).vehicleId).toBe("h100_trailer");
+    expect(recommendLoad(comboLoad).trips).toBe(1);
+  });
+});

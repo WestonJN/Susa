@@ -1,8 +1,8 @@
 import { site } from "../config/site";
 import { areas } from "../content/areas";
-import { vehicles } from "../lib/catalog";
 import { href } from "../lib/url";
 import { Container, LinkButton, Section } from "../components/ui";
+import { FleetShowcase } from "../components/fleet/FleetShowcase";
 
 const steps = [
   { t: "Search your addresses", d: "Type the pick-up and drop-off and pick them from the list. We work out the distance for you." },
@@ -54,17 +54,10 @@ export function Home() {
         </ol>
       </Section>
 
-      <Section title="Our vehicles" intro="A closed Hyundai H1 van, or the van with a trailer for bigger loads. Large moves are done in several trips.">
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {vehicles.map((v) => (
-            <li key={v.id} className="rounded-2xl border border-slate-200 bg-white p-5">
-              <h3 className="text-lg font-bold text-brand-900">{v.name}</h3>
-              <p className="text-sm text-slate-500">{v.tonnage}</p>
-              <p className="mt-2 text-slate-700">{v.bestFor}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-6 text-slate-600">
+      <FleetShowcase />
+
+      <Section>
+        <p className="text-slate-600">
           Also available: <a className="font-semibold text-brand-600 underline" href={href("/services/truck-hire/")}>truck transport</a> for furniture deliveries, donations and large items.
         </p>
       </Section>
