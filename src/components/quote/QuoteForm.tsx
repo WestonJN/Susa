@@ -8,6 +8,8 @@ import { Button, Counter, Field, inputClass } from "../ui";
 import { whatsappLink } from "../Layout";
 import { href } from "../../lib/url";
 import { LoadAssistant } from "./LoadAssistant";
+import { AddressSearch } from "./AddressSearch";
+import { routeDistanceKm, type Place } from "../../lib/geo";
 
 const STEPS = ["Route", "Truck", "Move details", "When", "Review"] as const;
 const WINDOWS = ["Early morning (06:00 to 09:00)", "Morning (09:00 to 12:00)", "Afternoon (12:00 to 16:00)", "Flexible"] as const;
@@ -15,6 +17,8 @@ const WINDOWS = ["Early morning (06:00 to 09:00)", "Morning (09:00 to 12:00)", "
 interface FormState {
   pickup: string;
   dropoff: string;
+  pickupPlace: Place | null;
+  dropoffPlace: Place | null;
   distanceKm: string;
   tollEstimate: string;
   vehicleId: string | null;
@@ -36,6 +40,8 @@ interface FormState {
 const initial: FormState = {
   pickup: "",
   dropoff: "",
+  pickupPlace: null,
+  dropoffPlace: null,
   distanceKm: "",
   tollEstimate: "",
   vehicleId: null,
@@ -62,7 +68,7 @@ function validate(step: number, s: FormState): Errors {
     if (clean(s.pickup).length < 5) e.pickup = "Enter the pick-up address or suburb.";
     if (clean(s.dropoff).length < 5) e.dropoff = "Enter the drop-off address or suburb.";
     const km = Number(s.distanceKm);
-    if (!s.distanceKm || !Number.isFinite(km) || km <= 0 || km > 2000) e.distanceKm = "Enter the approximate distance in km (1 to 2000).";
+    if (!s.distanceKm || !Number.isFinite(km) || km <= 0 || km > 150) e.distanceKm = "Enter the approximate driving distance in km (we currently serve Johannesburg only).";
   }
   if (step === 1 && !s.vehicleId) e.vehicleId = "Choose a truck, or use the load assistant.";
   if (step === 3) {
@@ -86,9 +92,35 @@ export function QuoteForm() {
   const [reference, setReference] = useState("");
   const [minDate, setMinDate] = useState("");
   const [key] = useState(newIdempotencyKey);
+  const [routing, setRouting] = useState(false);
+  const [routeNote, setRouteNote] = useState("");
+  const [distanceAuto, setDistanceAuto] = useState(false);
 
   useEffect(() => setMinDate(todayIso()), []);
   const patch = (p: Partial<FormState>) => setS((prev) => ({ ...prev, ...p }));
+
+  // Work out the driving distance as soon as both addresses were picked from the search.
+  useEffect(() => {
+    const { pickupPlace, dropoffPlace } = s;
+    if (!pickupPlace || !dropoffPlace) {
+      setRouteNote("");
+      setDistanceAuto(false);
+      return;
+    }
+    let cancelled = false;
+    setRouting(true);
+    routeDistanceKm(pickupPlace, dropoffPlace).then((r) => {
+      if (cancelled) return;
+      setS((prev) => ({ ...prev, distanceKm: String(r.km) }));
+      setDistanceAuto(true);
+      setRouteNote(r.estimated ? "Estimated from the map (routing was unavailable). Please check it." : "Driving distance between your two addresses.");
+      setRouting(false);
+    });
+    return () => {
+      cancelled = true;
+      setRouting(false);
+    };
+  }, [s.pickupPlace, s.dropoffPlace]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const volume = totalVolume(s.items) || null;
   const quote = useMemo(
@@ -140,7 +172,14 @@ export function QuoteForm() {
     const payload: QuoteRequestV1 = {
       schemaVersion: 1,
       idempotencyKey: key,
-      route: { pickup: clean(s.pickup), dropoff: clean(s.dropoff), distanceKm: Number(s.distanceKm), tollEstimate: Math.max(0, Number(s.tollEstimate) || 0) },
+      route: {
+        pickup: clean(s.pickup),
+        dropoff: clean(s.dropoff),
+        pickupPoint: s.pickupPlace ? { lat: s.pickupPlace.lat, lon: s.pickupPlace.lon } : null,
+        dropoffPoint: s.dropoffPlace ? { lat: s.dropoffPlace.lat, lon: s.dropoffPlace.lon } : null,
+        distanceKm: Number(s.distanceKm),
+        tollEstimate: Math.max(0, Number(s.tollEstimate) || 0),
+      },
       load: { vehicleId: s.vehicleId, tier: s.tier, trips: s.trips, helpers: s.helpers, floors: s.floors, volumeM3: volume, items: Object.fromEntries(Object.entries(s.items).filter(([, n]) => n > 0)) },
       schedule: { date: s.date, window: s.window },
       options: { goodsInTransitCoverRequested: s.cover },
@@ -198,28 +237,91 @@ export function QuoteForm() {
 
   return (
     <div className="pb-28">
-      <ol className="mb-6 flex items-center gap-1 overflow-x-auto text-xs font-semibold" aria-label="Progress">
-        {STEPS.map((label, i) => (
-          <li key={label} aria-current={i === step ? "step" : undefined} className={`flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1.5 ${i === step ? "bg-brand-900 text-white" : i < step ? "bg-brand-100 text-brand-900" : "bg-slate-200 text-slate-600"}`}>
-            <span>{i + 1}</span>
-            <span>{label}</span>
-          </li>
-        ))}
-      </ol>
+      <nav aria-label="Quote progress" className="mb-6">
+        <ol className="flex items-start">
+          {STEPS.map((label, i) => {
+            const done = i < step;
+            const current = i === step;
+            return (
+              <li key={label} aria-current={current ? "step" : undefined} className="relative flex flex-1 flex-col items-center">
+                {i > 0 && (
+                  <span aria-hidden="true" className={`absolute right-1/2 top-4 h-0.5 w-full -translate-y-1/2 transition-colors ${i <= step ? "bg-brand-600" : "bg-slate-200"}`} />
+                )}
+                <button
+                  type="button"
+                  disabled={!done}
+                  onClick={() => setStep(i)}
+                  aria-label={done ? `${label}, completed. Go back to this step` : label}
+                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+                    done
+                      ? "bg-brand-600 text-white hover:bg-brand-700"
+                      : current
+                        ? "bg-brand-900 text-white ring-4 ring-brand-100"
+                        : "bg-white text-slate-500 ring-2 ring-slate-200"
+                  }`}
+                >
+                  {done ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  ) : (
+                    i + 1
+                  )}
+                </button>
+                <span className={`mt-2 hidden text-xs font-semibold sm:block ${current ? "text-brand-900" : done ? "text-brand-600" : "text-slate-400"}`}>{label}</span>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="mt-3 text-center text-sm font-semibold text-brand-900 sm:hidden">
+          Step {step + 1} of {STEPS.length}: {STEPS[step]}
+        </p>
+      </nav>
 
       <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
         {step === 0 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">Where are you moving?</h2>
-            <Field label="Pick-up address" htmlFor="pickup" error={errors.pickup} hint="Street and suburb, or estate name.">
-              <input id="pickup" className={inputClass} autoComplete="street-address" maxLength={200} value={s.pickup} onChange={(e) => patch({ pickup: e.target.value })} placeholder="e.g. 12 Main Rd, Rosebank" />
-            </Field>
-            <Field label="Drop-off address" htmlFor="dropoff" error={errors.dropoff}>
-              <input id="dropoff" className={inputClass} maxLength={200} value={s.dropoff} onChange={(e) => patch({ dropoff: e.target.value })} placeholder="e.g. 8 Oak Ave, Centurion" />
-            </Field>
+            <div>
+              <h2 className="text-xl font-bold text-brand-900">Where are you moving?</h2>
+              <p className="mt-1 text-sm text-slate-600">We currently move within Johannesburg only. Search for each address and pick it from the list.</p>
+            </div>
+            <AddressSearch
+              id="pickup"
+              label="Pick-up address"
+              value={s.pickup}
+              place={s.pickupPlace}
+              placeholder="e.g. 12 Jan Smuts Avenue, Parktown"
+              error={errors.pickup}
+              onText={(pickup) => patch({ pickup })}
+              onPlace={(pickupPlace) => patch({ pickupPlace })}
+            />
+            <AddressSearch
+              id="dropoff"
+              label="Drop-off address"
+              value={s.dropoff}
+              place={s.dropoffPlace}
+              placeholder="e.g. 8 Cedar Road, Fourways"
+              error={errors.dropoff}
+              onText={(dropoff) => patch({ dropoff })}
+              onPlace={(dropoffPlace) => patch({ dropoffPlace })}
+            />
             <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Approximate distance (km)" htmlFor="km" error={errors.distanceKm} hint="Use a maps app for the driving distance. We re-check it before confirming.">
-                <input id="km" className={inputClass} inputMode="decimal" value={s.distanceKm} onChange={(e) => patch({ distanceKm: e.target.value.replace(/[^\d.]/g, "") })} />
+              <Field
+                label="Driving distance (km)"
+                htmlFor="km"
+                error={errors.distanceKm}
+                hint={routing ? "Working out the distance…" : distanceAuto ? routeNote : "Filled in automatically once both addresses are picked. You can also type it."}
+              >
+                <input
+                  id="km"
+                  className={inputClass}
+                  inputMode="decimal"
+                  value={s.distanceKm}
+                  onChange={(e) => {
+                    setDistanceAuto(false);
+                    patch({ distanceKm: e.target.value.replace(/[^\d.]/g, "").slice(0, 6) });
+                  }}
+                />
               </Field>
               <Field label="Toll costs, if any (R)" htmlFor="toll" hint="Optional. Leave blank if unsure.">
                 <input id="toll" className={inputClass} inputMode="numeric" value={s.tollEstimate} onChange={(e) => patch({ tollEstimate: e.target.value.replace(/\D/g, "").slice(0, 5) })} />
@@ -240,6 +342,8 @@ export function QuoteForm() {
                     <div className="font-bold text-brand-900">{veh.name}</div>
                     <div className="text-sm text-slate-500">{veh.tonnage}</div>
                     <p className="mt-1 text-sm text-slate-700">{veh.bestFor}</p>
+                    <p className="mt-2 text-xs font-medium text-slate-500">{veh.spec}</p>
+                    {veh.onRequest && <p className="mt-1 text-xs font-semibold text-amber-700">Subject to availability, confirmed when you book</p>}
                   </label>
                 ))}
               </div>

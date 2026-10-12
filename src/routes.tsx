@@ -20,7 +20,7 @@ const crumbs = (name: string, path: string) =>
 export const routes: Route[] = [
   {
     path: "/",
-    title: `${site.name} | Furniture Removals & Truck Transport in Gauteng`,
+    title: `${site.name} | Furniture Removals & Truck Transport in Johannesburg`,
     description: site.description,
     priority: 1,
     changefreq: "weekly",
@@ -30,7 +30,7 @@ export const routes: Route[] = [
   {
     path: "/get-quote/",
     title: `Get an Instant Moving Quote | ${site.name}`,
-    description: "Enter your route, choose a truck and see your moving price build up live. Furniture removals and truck transport in Johannesburg, Pretoria and Gauteng.",
+    description: "Search your addresses, choose a truck and see your moving price build up live. Furniture removals and truck transport in Johannesburg.",
     priority: 0.9,
     changefreq: "monthly",
     jsonLd: [crumbs("Get a quote", "/get-quote/")],
@@ -40,7 +40,7 @@ export const routes: Route[] = [
     const path = `/services/${s.slug}/`;
     return {
       path,
-      title: `${s.name} in Gauteng | ${site.name}`,
+      title: `${s.name} in Johannesburg | ${site.name}`,
       description: s.lead,
       priority: 0.8,
       changefreq: "monthly",
@@ -62,10 +62,9 @@ export const routes: Route[] = [
   }),
   {
     path: "/drive-with-us/",
-    title: `Drive With Us | Bakkie & Truck Drivers Wanted | ${site.name}`,
-    description: "Own a bakkie or truck in Gauteng? Apply to join our driver network for moving and delivery jobs.",
-    priority: 0.4,
-    changefreq: "monthly",
+    title: `Drive With Us (Coming Soon) | ${site.name}`,
+    description: "Driver partnerships are coming soon.",
+    noindex: true,
     jsonLd: [crumbs("Drive with us", "/drive-with-us/")],
     element: <DriveWithUs />,
   },

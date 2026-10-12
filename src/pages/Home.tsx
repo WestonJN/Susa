@@ -5,7 +5,7 @@ import { href } from "../lib/url";
 import { Container, LinkButton, Section } from "../components/ui";
 
 const steps = [
-  { t: "Tell us the route", d: "Pick-up, drop-off and roughly how far it is." },
+  { t: "Search your addresses", d: "Type the pick-up and drop-off and pick them from the list. We work out the distance for you." },
   { t: "Choose your truck", d: "Pick a size, or add your furniture and let the load assistant suggest one." },
   { t: "See the price build up", d: "Distance, crew, stairs and tolls are itemised as you go." },
   { t: "We confirm your booking", d: "A real person checks availability and your final price before anything is locked in." },
@@ -24,12 +24,12 @@ export function Home() {
     <>
       <section className="bg-brand-900 text-white">
         <Container className="py-14 sm:py-20">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent-400">Gauteng removals and truck transport</p>
+          <p className="text-sm font-semibold uppercase tracking-widest text-accent-400">Johannesburg removals and truck transport</p>
           <h1 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight sm:text-5xl">
-            Furniture removals in Johannesburg and Pretoria, priced upfront.
+            Furniture removals in Johannesburg, priced upfront.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-slate-200">
-            Choose the right truck, see exactly how your price is built, and send your request in minutes from your phone.
+            Search your addresses, choose the right truck, see exactly how your price is built, and send your request in minutes from your phone.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <LinkButton href={href("/get-quote/")}>Get an instant quote</LinkButton>
@@ -69,16 +69,15 @@ export function Home() {
         </p>
       </Section>
 
-      <Section id="areas" title="Areas we serve" intro="We operate across Gauteng. Local access rules matter, so we share what to expect in each area." tone="white">
-        <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-          {areas.map((a) => (
-            <li key={a.slug}>
-              <a href={href(`/areas/${a.slug}/`)} className="block rounded-xl border border-slate-200 p-4 font-semibold text-brand-900 hover:border-brand-500 hover:bg-brand-50">
-                Movers in {a.name}
-              </a>
-            </li>
+      <Section id="areas" title="Where we operate" intro="We currently move homes and offices within Johannesburg only. Local access rules matter, so we share what to expect." tone="white">
+        <ul className="flex flex-wrap gap-2">
+          {areas[0]?.nearby.map((n) => (
+            <li key={n} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">{n}</li>
           ))}
         </ul>
+        <p className="mt-6">
+          <a href={href("/areas/johannesburg/")} className="font-semibold text-brand-600 underline">Moving in Johannesburg: what to know</a>
+        </p>
       </Section>
 
       <Section title="Common questions">

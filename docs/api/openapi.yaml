@@ -249,19 +249,21 @@ components:
         idempotencyKey: { type: string, minLength: 8, maxLength: 80 }
         route:
           type: object
-          required: [pickup, dropoff, distanceKm, tollEstimate]
+          required: [pickup, dropoff, pickupPoint, dropoffPoint, distanceKm, tollEstimate]
           additionalProperties: false
           properties:
             pickup: { type: string, minLength: 5, maxLength: 200 }
             dropoff: { type: string, minLength: 5, maxLength: 200 }
-            distanceKm: { type: number, exclusiveMinimum: 0, maximum: 2000 }
+            pickupPoint: { $ref: "#/components/schemas/GeoPoint" }
+            dropoffPoint: { $ref: "#/components/schemas/GeoPoint" }
+            distanceKm: { type: number, exclusiveMinimum: 0, maximum: 150 }
             tollEstimate: { type: number, minimum: 0, maximum: 99999 }
         load:
           type: object
           required: [vehicleId, tier, trips, helpers, floors, volumeM3, items]
           additionalProperties: false
           properties:
-            vehicleId: { type: string, enum: [bakkie, t1_5, t4, t8] }
+            vehicleId: { type: string, enum: [h1, h1_trailer, t1_5, t4, t8] }
             tier: { type: string, enum: [transport, loading, full] }
             trips: { type: integer, minimum: 1, maximum: 10 }
             helpers: { type: integer, minimum: 0, maximum: 10 }
@@ -315,6 +317,14 @@ components:
           type: string
           maxLength: 0
           description: Honeypot. Must be empty; requests with a value are silently dropped.
+    GeoPoint:
+      description: Coordinates picked from the address search, or null when the address was typed by hand. Must lie inside the City of Johannesburg.
+      type: [object, "null"]
+      required: [lat, lon]
+      additionalProperties: false
+      properties:
+        lat: { type: number, minimum: -26.55, maximum: -25.85 }
+        lon: { type: number, minimum: 27.7, maximum: 28.35 }
     QuoteRequestAccepted:
       type: object
       required: [reference, statusToken]

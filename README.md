@@ -53,7 +53,7 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 ## SEO checklist (after the first live deploy)
 
 - Verify the site in **Google Search Console** and submit `sitemap.xml`; do the same in Bing Webmaster Tools.
-- Create and verify a **Google Business Profile** (service-area business, Gauteng). It matters more for local ranking than anything on-site.
+- Create and verify a **Google Business Profile** (service-area business, Johannesburg). It matters more for local ranking than anything on-site.
 - Fill in real contact details and review `src/content/areas.ts` copy; add real photos and genuine customer reviews later (do not add review markup until they are real).
 - Run Lighthouse on `/` and `/get-quote/` on a throttled mobile profile.
 - Re-run `python3 scripts/make-brand-assets.py "Name" "Tagline"` if the trading name changes.
@@ -61,6 +61,8 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 ## What is a placeholder
 
 - **All rates** in `src/lib/catalog.ts` (fleet fees, per-km, crew, floors, packing, floors/ceilings). Set them before launch.
+- **Trailer size** (`TRAILER_M3` in `src/lib/catalog.ts`) is assumed at 2.2 m³. Measure your trailer and update it; the H1 van uses the published 4.3 m³ panel-van figure. The 1.5/4/8 ton classes are scaled up from there and shown as "subject to availability".
+- **Address search** uses the free Photon (OpenStreetMap) and OSRM public services, limited to Johannesburg. Fine for launch; move to a paid provider behind the gateway as traffic grows.
 - Brand name "Susa", legal wording in `src/pages/Legal.tsx` (have a lawyer review for POPIA and consumer-law fit).
 - Distance is entered by the customer. Replace with a maps/routing lookup behind the gateway.
 - `POST {API_BASE_URL}/v1/quote-requests` contract is typed in `src/lib/api.ts`; the gateway is not built yet.

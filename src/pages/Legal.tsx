@@ -28,6 +28,10 @@ export function Privacy() {
           <p>Our staff, and drivers or crew assigned to your move, see only what they need to do the job. We use service providers (for example hosting and messaging) under agreements that require them to protect your information. We do not sell personal information.</p>
         </section>
         <section>
+          <h2 className="text-xl font-bold text-brand-900">Address search</h2>
+          <p>When you type an address on the quote form, the text you type is sent to an address-search service built on OpenStreetMap data (Photon), and the two coordinates you pick are sent to a routing service (OSRM) to work out the driving distance. Your name, phone number and email are not sent to these services.</p>
+        </section>
+        <section>
           <h2 className="text-xl font-bold text-brand-900">Automated assistance</h2>
           <p>We use automated tools to prepare quotes and organise work. A person reviews bookings, pricing exceptions and customer communications before they are confirmed.</p>
         </section>

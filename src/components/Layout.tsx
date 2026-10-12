@@ -21,7 +21,6 @@ function Logo() {
 const nav = [
   { label: "Home moving", to: "/services/home-moving/" },
   { label: "Truck hire", to: "/services/truck-hire/" },
-  { label: "Drive with us", to: "/drive-with-us/" },
 ] as const;
 
 export function whatsappLink(message?: string): string | null {
@@ -106,7 +105,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <div className="font-semibold text-white">Company</div>
             <ul className="mt-2 space-y-1 text-sm">
               <li><a className="hover:underline" href={href("/get-quote/")}>Get a quote</a></li>
-              <li><a className="hover:underline" href={href("/drive-with-us/")}>Drive with us</a></li>
+              <li><a className="hover:underline" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
               <li><a className="hover:underline" href={href("/privacy/")}>Privacy notice (POPIA)</a></li>
               <li><a className="hover:underline" href={href("/terms/")}>Terms of service</a></li>
             </ul>

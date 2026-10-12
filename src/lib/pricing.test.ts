@@ -30,7 +30,7 @@ describe("calculateQuote", () => {
   });
 
   it("never goes below the hard price floor", () => {
-    const q = calculateQuote({ ...base, vehicleId: "bakkie", distanceKm: 1 });
+    const q = calculateQuote({ ...base, vehicleId: "h1", distanceKm: 1 });
     expect(q.subtotal).toBe(600);
   });
 
@@ -41,13 +41,13 @@ describe("calculateQuote", () => {
   });
 
   it("routes quotes above the automatic ceiling to a human", () => {
-    const q = calculateQuote({ ...base, vehicleId: "bakkie", distanceKm: 400, trips: 3 });
+    const q = calculateQuote({ ...base, vehicleId: "h1", distanceKm: 400, trips: 3 });
     expect(q.status).toBe("needs_review");
     expect(q.confidence).toBeLessThanOrEqual(0.5);
   });
 
   it("flags inventory that cannot fit", () => {
-    const q = calculateQuote({ ...base, vehicleId: "bakkie", volumeM3: 20 });
+    const q = calculateQuote({ ...base, vehicleId: "h1", volumeM3: 20 });
     expect(q.status).toBe("needs_review");
   });
 
@@ -73,9 +73,18 @@ describe("recommendLoad", () => {
     expect(recommendLoad({}).vehicleId).toBeNull();
   });
 
+  it("sizes the first two classes from the Hyundai H1 van and trailer", () => {
+    const h1 = vehicles.find((v) => v.id === "h1")!;
+    const combo = vehicles.find((v) => v.id === "h1_trailer")!;
+    expect(h1.capacityM3).toBe(4.3);
+    expect(combo.capacityM3).toBeGreaterThan(h1.capacityM3);
+    expect(combo.capacityM3).toBeLessThan(vehicles.find((v) => v.id === "t1_5")!.capacityM3);
+  });
+
   it("picks the smallest vehicle that fits", () => {
-    expect(recommendLoad({ "box-medium": 5 }).vehicleId).toBe("bakkie");
-    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1 }).vehicleId).toBe("t1_5");
+    expect(recommendLoad({ "box-medium": 5 }).vehicleId).toBe("h1");
+    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1 }).vehicleId).toBe("h1_trailer");
+    expect(recommendLoad({ "queen-bed": 1, "sofa-3": 1, "fridge-double": 1, "dining-6": 1, "wardrobe-large": 1 }).vehicleId).toBe("t1_5");
   });
 
   it("uses multiple trips when the biggest truck is not enough", () => {

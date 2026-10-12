@@ -9,7 +9,14 @@ import { site } from "../config/site";
 export interface QuoteRequestV1 {
   schemaVersion: 1;
   idempotencyKey: string;
-  route: { pickup: string; dropoff: string; distanceKm: number; tollEstimate: number };
+  route: {
+    pickup: string;
+    dropoff: string;
+    pickupPoint: { lat: number; lon: number } | null;
+    dropoffPoint: { lat: number; lon: number } | null;
+    distanceKm: number;
+    tollEstimate: number;
+  };
   load: {
     vehicleId: string;
     tier: string;

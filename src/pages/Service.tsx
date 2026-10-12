@@ -15,10 +15,10 @@ export const services: Record<ServiceContent["slug"], ServiceContent> = {
   "home-moving": {
     slug: "home-moving",
     name: "Home moving",
-    h1: "Home moving and furniture removals in Gauteng",
+    h1: "Home moving and furniture removals in Johannesburg",
     lead: "Moving house or flat? Choose a truck, add a crew if you want one, and see the price before you commit.",
     points: [
-      { title: "Right-sized trucks", body: "From a bakkie for a student room to an 8 ton closed truck for a full family home, so you do not pay for space you will not use." },
+      { title: "Right-sized trucks", body: "From our Hyundai H1 van for a student room to a 8 ton closed truck for a full family home, so you do not pay for space you will not use." },
       { title: "Crew when you need it", body: "Pick transport only, a loading crew, or full service with packing. Add extra helpers if you have heavy items or many floors." },
       { title: "Stairs and access, priced honestly", body: "Tell us the floors and any estate or complex rules. They affect the crew time, so they are shown as a line in your quote." },
       { title: "Cover for your goods", body: "You can request goods-in-transit cover for the value you declare. It is subject to approved cover, limits and exclusions." },
@@ -29,7 +29,7 @@ export const services: Record<ServiceContent["slug"], ServiceContent> = {
   "truck-hire": {
     slug: "truck-hire",
     name: "Truck transport",
-    h1: "Truck transport, furniture delivery and bulk item removal",
+    h1: "Truck transport, furniture delivery and bulk item removal in Johannesburg",
     lead: "Need a truck and driver for a single delivery, a donation run or a large item? Get a route-based quote in a couple of minutes.",
     points: [
       { title: "Furniture and appliance delivery", body: "Collected from the shop or seller and delivered to your door, with a helper if the item is heavy." },

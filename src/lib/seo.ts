@@ -42,6 +42,7 @@ export function buildHead(site: Site, meta: PageMeta): string {
     `<meta name="twitter:description" content="${esc(meta.description)}" />`,
     `<meta name="twitter:image" content="${esc(ogImage)}" />`,
     `<meta name="geo.region" content="ZA-GP" />`,
+    `<meta name="geo.placename" content="Johannesburg" />`,
     site.gscVerification ? `<meta name="google-site-verification" content="${esc(site.gscVerification)}" />` : "",
     ...(meta.jsonLd ?? []).map(ldScript),
   ];
@@ -60,8 +61,8 @@ export function organizationLd(site: Site): JsonLd {
     description: site.description,
     ...(site.phone ? { telephone: site.phone } : {}),
     ...(site.email ? { email: site.email } : {}),
-    areaServed: { "@type": "AdministrativeArea", name: "Gauteng, South Africa" },
-    address: { "@type": "PostalAddress", addressRegion: "Gauteng", addressCountry: "ZA" },
+    areaServed: { "@type": "City", name: "Johannesburg" },
+    address: { "@type": "PostalAddress", addressLocality: "Johannesburg", addressRegion: "Gauteng", addressCountry: "ZA" },
     priceRange: "$$",
   };
 }
@@ -90,7 +91,7 @@ export function breadcrumbLd(site: Site, trail: { name: string; path: string }[]
   };
 }
 
-export function serviceLd(site: Site, name: string, description: string, path: string, area = "Gauteng, South Africa"): JsonLd {
+export function serviceLd(site: Site, name: string, description: string, path: string, area = "Johannesburg, Gauteng, South Africa"): JsonLd {
   return {
     "@context": "https://schema.org",
     "@type": "Service",

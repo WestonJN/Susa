@@ -103,7 +103,7 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
   }
   if (km > rates.longDistanceKm) {
     confidence -= 0.3;
-    reasons.push("Long-distance moves are priced manually.");
+    reasons.push("Routes this far outside Johannesburg are priced by our team.");
   }
   if (subtotal > vehicle.maxAutoQuote) {
     confidence = Math.min(confidence, 0.5);

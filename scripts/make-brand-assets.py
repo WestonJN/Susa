@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 name = sys.argv[1] if len(sys.argv) > 1 else "Susa"
-tagline = sys.argv[2] if len(sys.argv) > 2 else "Furniture removals and truck transport across Gauteng"
+tagline = sys.argv[2] if len(sys.argv) > 2 else "Furniture removals and truck transport in Johannesburg"
 out = Path(__file__).resolve().parent.parent / "public"
 
 NAVY, AMBER, WHITE = (15, 42, 67), (245, 158, 11), (255, 255, 255)
