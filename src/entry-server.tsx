@@ -8,7 +8,7 @@ export function render(path: string): { html: string; head: string } {
   const route = path === notFoundRoute.path ? notFoundRoute : findRoute(path);
   return {
     html: renderToString(<App path={path} />),
-    head: buildHead(site, route, import.meta.env.BASE_URL),
+    head: buildHead(site, route),
   };
 }
 

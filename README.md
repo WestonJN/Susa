@@ -22,27 +22,37 @@ npm run typecheck && npm test
 npm run build                # client + server bundle + prerender into dist/
 ```
 
-## Deploy (GitHub Actions to GitHub Pages)
+## Deploy (GitHub Actions to GitHub Pages, no domain needed)
 
-1. Push this repo to GitHub (default branch `main`).
-2. **Settings > Pages > Source: GitHub Actions.**
-3. **Settings > Secrets and variables > Actions > Variables**, add:
+The workflow in `.github/workflows/deploy.yml` needs **no variables and no domain**. It publishes to
+`https://<owner>.github.io/<repo>/` (for this repo: `https://westonjn.github.io/Susa/`) and sets every URL,
+canonical tag, sitemap entry and asset path to match.
+
+1. Make sure `.github/workflows/deploy.yml` is in the repo. The GitHub web uploader skips hidden folders, so
+   add it with **Add file > Create new file**, name it `.github/workflows/deploy.yml`, and paste the contents.
+2. **Settings > Pages > Build and deployment > Source: GitHub Actions** (the workflow also tries to switch this on itself).
+3. Push to `main` (or run **Actions > Deploy to GitHub Pages > Run workflow**). The first run takes about two minutes.
+
+Optional repository Variables (Settings > Secrets and variables > Actions > Variables), all safe to add later:
 
 | Variable | Example | Notes |
 | --- | --- | --- |
-| `SITE_URL` | `https://www.yourdomain.co.za` | **Required to go live.** Until it is set, the build is in staging mode: `robots.txt` blocks crawling and pages are `noindex`. |
-| `SITE_BASE` | `/` | Use `/<repo-name>/` if serving from `user.github.io/<repo>` with no custom domain. |
-| `CUSTOM_DOMAIN` | `www.yourdomain.co.za` | Writes `CNAME`. Also set the domain under Settings > Pages and add DNS records. |
+| `CUSTOM_DOMAIN` | `www.yourdomain.co.za` | When you buy a domain: set this, add the domain under Settings > Pages and point DNS at GitHub. URLs switch over automatically. |
 | `SITE_NAME`, `WHATSAPP_NUMBER`, `PHONE`, `CONTACT_EMAIL` | | `WHATSAPP_NUMBER` is digits only, e.g. `27821234567`. |
 | `API_BASE_URL` | `https://api.yourdomain.co.za` | Orchestrator gateway. Empty = the form falls back to WhatsApp/email. |
 | `VAT_REGISTERED` | `true` / `false` | Adds a VAT line to quotes. |
 | `GSC_VERIFICATION` | | Optional Search Console meta token. |
 
-4. Push to `main`. `deploy.yml` runs typecheck, tests, build and publishes. `ci.yml` runs the same checks on pull requests and non-main branches.
+`ci.yml` runs typecheck, tests and a build on pull requests and non-main branches.
+
+> **github.io and SEO:** on a project page the site lives under `/<repo>/`, so Google ignores its `robots.txt`
+> (crawlers only read the one at the domain root). That is harmless, but you **must submit the sitemap
+> yourself** in Google Search Console (add the property `https://<owner>.github.io/<repo>/` and submit
+> `sitemap.xml`). A real domain later gives better local-search and branding results.
 
 ## SEO checklist (after the first live deploy)
 
-- Verify the site in **Google Search Console** and submit `/sitemap.xml`; do the same in Bing Webmaster Tools.
+- Verify the site in **Google Search Console** and submit `sitemap.xml`; do the same in Bing Webmaster Tools.
 - Create and verify a **Google Business Profile** (service-area business, Gauteng). It matters more for local ranking than anything on-site.
 - Fill in real contact details and review `src/content/areas.ts` copy; add real photos and genuine customer reviews later (do not add review markup until they are real).
 - Run Lighthouse on `/` and `/get-quote/` on a throttled mobile profile.

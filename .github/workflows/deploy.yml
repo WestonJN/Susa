@@ -1,5 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Works with no domain and no settings: the site is published at
+#   https://<owner>.github.io/<repo>/
+# Optional repository Variables (Settings > Secrets and variables > Actions > Variables):
+#   CUSTOM_DOMAIN, SITE_NAME, WHATSAPP_NUMBER, PHONE, CONTACT_EMAIL, API_BASE_URL, VAT_REGISTERED, GSC_VERIFICATION
+
 on:
   push:
     branches: [main]
@@ -27,12 +32,35 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+
+      - name: Work out the site address
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          VAR_SITE_URL: ${{ vars.SITE_URL }}
+          VAR_SITE_BASE: ${{ vars.SITE_BASE }}
+        run: |
+          owner="$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')"
+          repo_lc="$(echo "$REPO" | tr '[:upper:]' '[:lower:]')"
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            url="https://$CUSTOM_DOMAIN"; base="/"
+          elif [ -n "$VAR_SITE_URL" ]; then
+            url="$VAR_SITE_URL"; base="${VAR_SITE_BASE:-/}"
+          elif [ "$repo_lc" = "$owner.github.io" ]; then
+            url="https://$owner.github.io"; base="/"
+          else
+            url="https://$owner.github.io"; base="/$REPO/"
+          fi
+          echo "Publishing at: $url$base"
+          echo "SITE_URL=$url" >> "$GITHUB_ENV"
+          echo "SITE_BASE=$base" >> "$GITHUB_ENV"
+
       - name: Build
         run: npm run build
         env:
-          # Set these under Settings > Secrets and variables > Actions > Variables.
-          VITE_SITE_URL: ${{ vars.SITE_URL }}
-          VITE_BASE: ${{ vars.SITE_BASE || '/' }}
+          VITE_SITE_URL: ${{ env.SITE_URL }}
+          VITE_BASE: ${{ env.SITE_BASE }}
           CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
           VITE_SITE_NAME: ${{ vars.SITE_NAME || 'Susa' }}
           VITE_WHATSAPP_NUMBER: ${{ vars.WHATSAPP_NUMBER }}
@@ -41,7 +69,10 @@ jobs:
           VITE_API_BASE_URL: ${{ vars.API_BASE_URL }}
           VITE_VAT_REGISTERED: ${{ vars.VAT_REGISTERED || 'false' }}
           VITE_GSC_VERIFICATION: ${{ vars.GSC_VERIFICATION }}
+
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

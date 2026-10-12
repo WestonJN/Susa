@@ -16,14 +16,13 @@ export interface PageMeta {
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const ldScript = (obj: JsonLd) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, "\\u003c")}</script>`;
 
-export function canonical(site: Site, path: string, base: string): string {
-  const prefix = base === "/" ? "" : base.replace(/\/$/, "");
-  return `${site.url}${prefix}${path === "/" ? "/" : path}`;
+export function canonical(site: Site, path: string): string {
+  return `${site.url}${path}`;
 }
 
-export function buildHead(site: Site, meta: PageMeta, base: string): string {
-  const url = canonical(site, meta.path, base);
-  const ogImage = `${site.url}${base === "/" ? "" : base.replace(/\/$/, "")}/og-image.png`;
+export function buildHead(site: Site, meta: PageMeta): string {
+  const url = canonical(site, meta.path);
+  const ogImage = `${site.url}/og-image.png`;
   const parts = [
     `<title>${esc(meta.title)}</title>`,
     `<meta name="description" content="${esc(meta.description)}" />`,

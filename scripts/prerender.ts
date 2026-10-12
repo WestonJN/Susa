@@ -19,7 +19,6 @@ interface ServerBundle {
 
 const root = resolve(import.meta.dirname, "..");
 const dist = join(root, "dist");
-const base = (process.env.VITE_BASE ?? "/").replace(/\/?$/, "/");
 
 const bundle = (await import(pathToFileURL(join(root, "dist-server", "entry-server.js")).href)) as ServerBundle;
 const template = readFileSync(join(dist, "index.html"), "utf8");
@@ -42,8 +41,7 @@ for (const page of bundle.pages) {
   writeFileSync(file, out);
 }
 
-const prefix = base === "/" ? "" : base.replace(/\/$/, "");
-const urls = bundle.pages.filter((p) => !p.noindex).map((p) => `${bundle.siteUrl}${prefix}${p.path}`);
+const urls = bundle.pages.filter((p) => !p.noindex).map((p) => `${bundle.siteUrl}${p.path}`);
 writeFileSync(
   join(dist, "sitemap.xml"),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
@@ -55,7 +53,7 @@ writeFileSync(
   join(dist, "robots.txt"),
   staging
     ? "User-agent: *\nDisallow: /\n"
-    : `User-agent: *\nAllow: /\n\nSitemap: ${bundle.siteUrl}${prefix}/sitemap.xml\n`,
+    : `User-agent: *\nAllow: /\n\nSitemap: ${bundle.siteUrl}/sitemap.xml\n`,
 );
 
 writeFileSync(join(dist, ".nojekyll"), "");
