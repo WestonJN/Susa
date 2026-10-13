@@ -65,3 +65,7 @@ if (!process.env.VITE_API_BASE_URL && !process.env.VITE_WHATSAPP_NUMBER && !proc
 }
 
 console.log(`Prerendered ${bundle.pages.length} pages, ${urls.length} in sitemap.`);
+
+if (!process.env.VITE_LEGAL_NAME || !process.env.VITE_BUSINESS_ADDRESS) {
+  console.warn("::warning title=Business details missing::Set the LEGAL_NAME, REG_NUMBER and BUSINESS_ADDRESS repository variables (and VAT_NUMBER if registered). Online businesses in South Africa are expected to show them.");
+}

@@ -1,77 +1,160 @@
+import { Fragment, type ReactNode } from "react";
 import { site } from "../config/site";
 import { Container } from "../components/ui";
+import { href } from "../lib/url";
 
 const contact = () => site.email || "the contact details on this website";
+const H = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-bold text-brand-900">{children}</h2>;
+const A = ({ to, children }: { to: string; children: ReactNode }) => <a className="font-semibold text-brand-600 underline" href={href(to)}>{children}</a>;
+const Page = ({ title, children }: { title: string; children: ReactNode }) => (
+  <Container className="max-w-3xl py-10 sm:py-14">
+    <h1 className="text-3xl font-extrabold text-brand-900">{title}</h1>
+    <p className="mt-2 text-sm text-slate-600">Last updated {site.consentVersion}</p>
+    <div className="mt-6 space-y-5 text-slate-700">{children}</div>
+    <p className="mt-8 text-sm text-slate-600">This is a plain-language policy and should be reviewed by a legal adviser before launch.</p>
+  </Container>
+);
+
+export function BusinessDetails() {
+  const rows: Array<[string, string]> = [
+    ["Trading name", site.name], ["Registered name", site.legalName], ["Registration number", site.regNumber],
+    ["VAT number", site.vatNumber], ["Address", site.address], ["Email", site.email], ["Phone", site.phone],
+  ];
+  const shown = rows.filter(([, v]) => v);
+  return (
+    <dl className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-[auto_1fr]">
+      {shown.map(([k, v]) => (<Fragment key={k}><dt className="font-semibold text-brand-900">{k}</dt><dd>{v}</dd></Fragment>))}
+    </dl>
+  );
+}
 
 export function Privacy() {
   return (
-    <Container className="prose-lg max-w-3xl py-10 sm:py-14">
-      <h1 className="text-3xl font-extrabold text-brand-900">Privacy notice (POPIA)</h1>
-      <p className="mt-2 text-sm text-slate-500">Version {site.consentVersion}</p>
-      <div className="mt-6 space-y-5 text-slate-700">
-        <p>{site.name} respects your privacy and processes personal information in line with the Protection of Personal Information Act, 2013 (POPIA).</p>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Who is responsible</h2>
-          <p>{site.name} is the responsible party. Contact us at {contact()} for any privacy question or request.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">What we collect and why</h2>
-          <ul className="list-disc space-y-1 pl-5">
-            <li>Your name, mobile number and optional email, to contact you about your quote and move.</li>
-            <li>Pick-up and drop-off addresses, move date and inventory, to price and plan your move.</li>
-            <li>Technical data such as your IP address, used for security and abuse prevention.</li>
-          </ul>
-          <p className="mt-2">We do not ask for your ID number through this website.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Who sees it</h2>
-          <p>Our staff, and drivers or crew assigned to your move, see only what they need to do the job. We use service providers (for example hosting and messaging) under agreements that require them to protect your information. We do not sell personal information.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Address search</h2>
-          <p>When you type an address on the quote form, the text you type is sent to an address-search service (Google Places when enabled, otherwise the OpenStreetMap-based Photon service), and the coordinates of the two addresses you pick are sent to a routing service (OSRM) to work out the driving distance. Your name, phone number and email are not sent to these services.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Automated assistance</h2>
-          <p>We use automated tools to prepare quotes and organise work. A person reviews bookings, pricing exceptions and customer communications before they are confirmed.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">How long we keep it</h2>
-          <p>We keep quote requests and move records only as long as needed for the move, our legal and accounting obligations, and handling any claim or dispute, then delete or de-identify them.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Your rights</h2>
-          <p>You may ask to access, correct or delete your personal information, and object to its processing, by contacting us. If you are unhappy with how we handle a request, you can complain to the Information Regulator at <a className="font-semibold text-brand-600 underline" href="https://inforegulator.org.za" rel="noopener">inforegulator.org.za</a>.</p>
-        </section>
-      </div>
-    </Container>
+    <Page title="Privacy notice (POPIA)">
+      <p>{site.name} respects your privacy and processes personal information in line with the Protection of Personal Information Act, 2013 (POPIA).</p>
+      <section>
+        <H>Who is responsible</H>
+        <BusinessDetails />
+        <p className="mt-2">{site.name} is the responsible party. For any privacy question or request, contact {contact()}, or use our <A to="/data-request/">data request page</A>.</p>
+      </section>
+      <section>
+        <H>What we collect and why</H>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>Your name, mobile number and optional email, to contact you about your quote and move.</li>
+          <li>Pick-up and drop-off addresses, move date and inventory, to price and plan your move.</li>
+          <li>Technical data such as your IP address, used for security and abuse prevention.</li>
+        </ul>
+        <p className="mt-2">We collect only what we need for the quote and the move. We do not ask for your ID number, banking details or payment card through this website.</p>
+      </section>
+      <section>
+        <H>Who sees it, and where it goes</H>
+        <p>Our staff, and drivers or crew assigned to your move, see only what they need to do the job. We do not sell personal information. These outside services are involved:</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5">
+          <li><strong>GitHub Pages</strong> hosts this website (United States). It receives your IP address when you load a page, as any host does.</li>
+          <li><strong>Address search:</strong> the text you type in an address box goes to Photon, an OpenStreetMap-based service (Germany), or to Google Places (United States) if we have enabled it.</li>
+          <li><strong>OSRM</strong> (routing) receives the coordinates of the two addresses you pick to work out the driving distance.</li>
+          <li><strong>WhatsApp or email:</strong> if you send your request that way, it goes through your own WhatsApp or email app, under their terms.</li>
+        </ul>
+        <p className="mt-2">Your name, phone number and email are never sent to the address-search or routing services. Some of these providers are outside South Africa, so your information may be processed abroad.</p>
+      </section>
+      <section>
+        <H>Cookies and tracking</H>
+        <p>We do not use cookies, analytics or advertising trackers. See the <A to="/cookies/">cookie policy</A>.</p>
+      </section>
+      <section>
+        <H>Messages and unsubscribing</H>
+        <p>We only contact you about the quote or move you asked about. We do not send marketing emails or messages. If that ever changes we will ask for your separate permission, and every marketing message will include an unsubscribe link or a reply-STOP option.</p>
+      </section>
+      <section>
+        <H>Children</H>
+        <p>Our services are for people aged 18 and over. We do not knowingly collect information from children. If you think a child has sent us information, tell us and we will delete it.</p>
+      </section>
+      <section>
+        <H>Automated assistance</H>
+        <p>We use automated tools to prepare quotes and organise work. A person reviews bookings, pricing exceptions and customer communications before they are confirmed.</p>
+      </section>
+      <section>
+        <H>How long we keep it</H>
+        <p>We keep quote requests and move records only as long as needed for the move, our legal and accounting obligations, and handling any claim or dispute, then delete or de-identify them.</p>
+      </section>
+      <section>
+        <H>Your rights, including deletion</H>
+        <p>You may ask to access, correct or delete your personal information, and object to its processing. Use the <A to="/data-request/">data request page</A> or contact {contact()}. We reply within 30 days. We may need to keep some records the law requires (for example invoices). If you are unhappy with how we handle a request, you can complain to the Information Regulator at <a className="font-semibold text-brand-600 underline" href="https://inforegulator.org.za" rel="noopener">inforegulator.org.za</a>.</p>
+      </section>
+    </Page>
   );
 }
 
 export function Terms() {
   return (
-    <Container className="max-w-3xl py-10 sm:py-14">
-      <h1 className="text-3xl font-extrabold text-brand-900">Terms of service</h1>
-      <div className="mt-6 space-y-5 text-slate-700">
-        <p>These terms summarise how quotes and bookings work with {site.name}. Questions? Contact {contact()}.</p>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Quotes</h2>
-          <p>Online prices are estimates based on the details you enter. A booking is only confirmed when our team confirms availability and the final price with you. Requesting a quote does not create a booking and you are not charged.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">What is excluded</h2>
-          <p>Quotes exclude packing, wrapping, dismantling and preparation services unless you chose Full service or arranged them separately.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Goods-in-transit cover</h2>
-          <p>Cover is optional, subject to approval for the declared value, and limits, exclusions and full terms apply.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-brand-900">Changes and cancellations</h2>
-          <p>Tell us as early as possible if your plans change. Any cancellation or change terms will be set out in your booking confirmation.</p>
-        </section>
-        <p className="text-sm text-slate-500">This is a plain-language summary and should be reviewed by a legal adviser before launch.</p>
-      </div>
-    </Container>
+    <Page title="Terms of service">
+      <p>These terms explain how quotes and bookings work with {site.name}. Questions? Contact {contact()}.</p>
+      <section><H>Who we are</H><BusinessDetails /></section>
+      <section>
+        <H>Who can use this site</H>
+        <p>You must be 18 or older to request a quote or make a booking.</p>
+      </section>
+      <section>
+        <H>Quotes and prices</H>
+        <p>Online prices are estimates based on the details you enter. A booking is only confirmed when our team confirms availability and the final price with you. Requesting a quote does not create a booking and you are not charged.</p>
+        <p className="mt-2">The estimate shows each part of the price: transport, crew, stairs, tolls and packing where chosen. Any change to that price, such as extra trips, more items than listed or longer waiting time, is explained and agreed with you before it is charged. We do not add fees you have not been told about.</p>
+      </section>
+      <section>
+        <H>What is excluded</H>
+        <p>Quotes exclude packing, wrapping, dismantling and preparation services unless you chose Full service or arranged them separately.</p>
+      </section>
+      <section>
+        <H>Goods in transit</H>
+        <p>Goods-in-transit cover may be offered for an agreed declared value. If it is, the limits, exclusions and full terms are given to you in writing before your booking is confirmed. Please tell us about fragile, valuable or unusually heavy items.</p>
+      </section>
+      <section>
+        <H>Changes and cancellations</H>
+        <p>See our <A to="/cancellations/">cancellation and refund policy</A>.</p>
+      </section>
+      <section>
+        <H>Privacy</H>
+        <p>See our <A to="/privacy/">privacy notice</A>.</p>
+      </section>
+      <section>
+        <H>Law and complaints</H>
+        <p>These terms are governed by South African law. Nothing here limits your rights under the Consumer Protection Act. Contact {contact()} first with any complaint so we can fix it.</p>
+      </section>
+    </Page>
+  );
+}
+
+export function Cancellations() {
+  return (
+    <Page title="Cancellation and refund policy">
+      <p>This policy applies to bookings confirmed with {site.name}. Requesting a quote is free and creates no obligation.</p>
+      <section>
+        <H>Cancelling or rescheduling</H>
+        <p>Tell us as early as you can, by email or WhatsApp. Your booking confirmation sets out the exact cancellation window and any fee that applies. We will not charge a fee that was not in your confirmation.</p>
+      </section>
+      <section>
+        <H>Refunds</H>
+        <p>If you pay a deposit and cancel within the window in your confirmation, the deposit is refunded in full to the account you paid from, normally within 7 working days. If we cancel or cannot do the move, you get a full refund and we will help you find another date.</p>
+      </section>
+      <section>
+        <H>If something goes wrong</H>
+        <p>Report any damage or problem as soon as possible, ideally on the day, with photos, to {contact()}. We will review it and respond in writing. This policy does not limit your rights under the Consumer Protection Act.</p>
+      </section>
+    </Page>
+  );
+}
+
+export function Cookies() {
+  return (
+    <Page title="Cookie policy">
+      <p>This website does <strong>not</strong> set cookies and does not use analytics, advertising or social-media trackers. Because of that, there is no cookie banner: there is nothing to consent to.</p>
+      <section>
+        <H>What your browser may still do</H>
+        <p>Like any website, our host (GitHub Pages) and the services that power the address search receive technical information such as your IP address when your browser contacts them. See the <A to="/privacy/">privacy notice</A> for who they are.</p>
+      </section>
+      <section>
+        <H>If this changes</H>
+        <p>If we later add analytics or any non-essential cookies, we will update this page and show a banner that lets you accept or refuse them before anything is set.</p>
+      </section>
+    </Page>
   );
 }

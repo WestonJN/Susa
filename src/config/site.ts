@@ -16,11 +16,16 @@ export const site = {
   whatsapp: ((env.VITE_WHATSAPP_NUMBER as string | undefined) ?? "").replace(/\D/g, ""),
   email: (env.VITE_CONTACT_EMAIL as string | undefined) ?? "",
   apiBase: ((env.VITE_API_BASE_URL as string | undefined) ?? "").replace(/\/$/, ""),
+  /** Business details shown in the footer and legal pages. Empty fields are hidden. */
+  legalName: (env.VITE_LEGAL_NAME as string | undefined) ?? "",
+  regNumber: (env.VITE_REG_NUMBER as string | undefined) ?? "",
+  vatNumber: (env.VITE_VAT_NUMBER as string | undefined) ?? "",
+  address: (env.VITE_BUSINESS_ADDRESS as string | undefined) ?? "",
   vatRegistered: env.VITE_VAT_REGISTERED === "true",
   vatRate: 0.15,
   gscVerification: (env.VITE_GSC_VERIFICATION as string | undefined) ?? "",
   /** Bump when the privacy notice / consent wording changes (stored with each consent). */
-  consentVersion: "2026-10-11",
+  consentVersion: "2026-10-13",
 } as const;
 
 export type Site = typeof site;

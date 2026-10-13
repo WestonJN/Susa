@@ -7,7 +7,8 @@ import { QuotePage } from "./pages/QuotePage";
 import { ServicePage, services } from "./pages/Service";
 import { AreaPage } from "./pages/AreaPage";
 import { DriveWithUs } from "./pages/DriveWithUs";
-import { Privacy, Terms } from "./pages/Legal";
+import { Cancellations, Cookies, Privacy, Terms } from "./pages/Legal";
+import { DataRequest } from "./pages/DataRequest";
 import { NotFound } from "./pages/NotFound";
 
 export interface Route extends PageMeta {
@@ -83,6 +84,30 @@ export const routes: Route[] = [
     priority: 0.3,
     changefreq: "yearly",
     element: <Terms />,
+  },
+  {
+    path: "/cancellations/",
+    title: `Cancellation & Refund Policy | ${site.name}`,
+    description: `How cancellations, rescheduling and refunds work with ${site.name}.`,
+    priority: 0.3,
+    changefreq: "yearly",
+    element: <Cancellations />,
+  },
+  {
+    path: "/cookies/",
+    title: `Cookie Policy | ${site.name}`,
+    description: `${site.name} does not use cookies or tracking on this website.`,
+    priority: 0.2,
+    changefreq: "yearly",
+    element: <Cookies />,
+  },
+  {
+    path: "/data-request/",
+    title: `Data Request (POPIA) | ${site.name}`,
+    description: "Ask to delete, correct or receive a copy of your personal information.",
+    priority: 0.2,
+    changefreq: "yearly",
+    element: <DataRequest />,
   },
 ];
 

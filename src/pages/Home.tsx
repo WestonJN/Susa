@@ -26,10 +26,10 @@ export function Home() {
         <Container className="py-14 sm:py-20">
           <p className="text-sm font-semibold uppercase tracking-widest text-accent-400">Johannesburg removals and truck transport</p>
           <h1 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight sm:text-5xl">
-            Furniture removals in Johannesburg, priced upfront.
+            Furniture removals in Johannesburg, with a clear price estimate.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-slate-200">
-            Search your addresses, choose the right truck, see exactly how your price is built, and send your request in minutes from your phone.
+            Search your addresses, choose the right vehicle, see how your estimate is built, and send your request in minutes from your phone.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <LinkButton href={href("/get-quote/")}>Get an instant quote</LinkButton>

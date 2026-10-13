@@ -108,11 +108,17 @@ export function Layout({ children }: { children: ReactNode }) {
               <li><a className="hover:underline" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
               <li><a className="hover:underline" href={href("/privacy/")}>Privacy notice (POPIA)</a></li>
               <li><a className="hover:underline" href={href("/terms/")}>Terms of service</a></li>
+              <li><a className="hover:underline" href={href("/cancellations/")}>Cancellations and refunds</a></li>
+              <li><a className="hover:underline" href={href("/cookies/")}>Cookie policy</a></li>
+              <li><a className="hover:underline" href={href("/data-request/")}>Data request (delete or access)</a></li>
             </ul>
           </nav>
         </Container>
-        <div className="border-t border-white/10 py-4 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} {site.name}. All rights reserved.
+        <div className="border-t border-white/10 py-4 px-4 text-center text-xs text-slate-300">
+          © {new Date().getFullYear()} {site.legalName || site.name}.
+          {site.regNumber && <> Reg. {site.regNumber}.</>}
+          {site.vatNumber && <> VAT {site.vatNumber}.</>}
+          {site.address && <> {site.address}.</>} All rights reserved.
         </div>
       </footer>
 

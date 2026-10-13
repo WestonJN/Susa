@@ -12,6 +12,7 @@ slow connections) and then hydrated.
 4. [CEO Agent system prompt and guardrail protocol](docs/04-ceo-agent-system-prompt-and-guardrails.md)
 5. [API schema and event flow](docs/05-api-schema-and-event-flow.md) and [`docs/api/openapi.yaml`](docs/api/openapi.yaml)
 6. [How it works today: built vs designed, calculations, next steps](docs/06-how-it-works-today.md)
+7. [Legal and compliance checklist](docs/07-legal-and-compliance-checklist.md)
 
 ## Develop
 
@@ -42,6 +43,7 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 | `SITE_NAME`, `WHATSAPP_NUMBER`, `PHONE`, `CONTACT_EMAIL` | | `WHATSAPP_NUMBER` is digits only, e.g. `27821234567`. |
 | `API_BASE_URL` | `https://api.yourdomain.co.za` | Orchestrator gateway. Empty = the form falls back to WhatsApp/email. |
 | `VAT_REGISTERED` | `true` / `false` | Adds a VAT line to quotes. |
+| `LEGAL_NAME`, `REG_NUMBER`, `BUSINESS_ADDRESS`, `VAT_NUMBER` | | Business details shown in the footer and legal pages. Set before launch. |
 | `GSC_VERIFICATION` | | Optional Search Console meta token. |
 | `GOOGLE_MAPS_API_KEY` | | Optional. Switches address search to Google Places (New). Enable *Places API (New)*, restrict the key to HTTP referrer `https://westonjn.github.io/*`, cap the daily quota. Without it the free Photon service is used. |
 

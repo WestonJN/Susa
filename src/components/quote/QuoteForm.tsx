@@ -267,7 +267,7 @@ export function QuoteForm() {
                     i + 1
                   )}
                 </button>
-                <span className={`mt-2 hidden text-xs font-semibold sm:block ${current ? "text-brand-900" : done ? "text-brand-600" : "text-slate-400"}`}>{label}</span>
+                <span className={`mt-2 hidden text-xs font-semibold sm:block ${current ? "text-brand-900" : done ? "text-brand-600" : "text-slate-600"}`}>{label}</span>
               </li>
             );
           })}
@@ -429,7 +429,7 @@ export function QuoteForm() {
               <label className="flex items-start gap-3">
                 <input type="checkbox" className="mt-1 h-5 w-5" checked={s.consent} onChange={(e) => patch({ consent: e.target.checked })} />
                 <span className="text-sm">
-                  I have read the <a className="font-semibold text-brand-600 underline" href={href("/privacy/")}>privacy notice</a> and agree that {site.name} may use these details to prepare my quote and contact me about this move.
+                  I am 18 or older, I have read the <a className="font-semibold text-brand-600 underline" href={href("/privacy/")}>privacy notice</a> and <a className="font-semibold text-brand-600 underline" href={href("/terms/")}>terms</a>, and I agree that {site.name} may use these details to prepare my quote and contact me about this move.
                 </span>
               </label>
               {errors.consent && <p role="alert" className="mt-1 text-sm font-medium text-red-700">{errors.consent}</p>}
