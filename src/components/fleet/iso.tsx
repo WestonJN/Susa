@@ -10,6 +10,10 @@ export const shades = {
   card: ["#f0cf96", "#d8ae6c", "#bc9255"],
   tape: ["#fff3d1", "#f1dca4", "#e2c985"],
   slate: ["#7b8da0", "#5c6e82", "#475a6d"],
+  grey: ["#b9c0c8", "#9aa3ad", "#838d98"],
+  orange: ["#f4a77f", "#dc7a4c", "#bc6038"],
+  orangeL: ["#f9c0a0", "#e8906a", "#cc7343"],
+  steel: ["#f4f7fa", "#d5dde5", "#bcc7d2"],
 } satisfies Record<string, Shade>;
 
 export type ShadeName = keyof typeof shades;
@@ -74,17 +78,34 @@ export const studentDesk = (): Cuboid[] => [
 ];
 
 export const queenBed = (): Cuboid[] => [
-  cb(0, 0, 0, 1.6, 2, 0.25, "wood"), cb(0, 0, 0, 1.6, 0.1, 0.95, "wood"), cb(0.05, 0.1, 0.25, 1.5, 1.88, 0.3, "white"),
-  cb(0.15, 0.18, 0.55, 0.55, 0.38, 0.12, "blue"), cb(0.9, 0.18, 0.55, 0.55, 0.38, 0.12, "blue"),
+  cb(0, 0, 0, 1.6, 2, 0.25, "wood"), cb(0, 0, 0, 1.6, 0.1, 0.95, "wood"), cb(0.05, 0.1, 0.25, 1.5, 1.88, 0.3, "grey"),
+  cb(0.15, 0.18, 0.55, 0.55, 0.38, 0.12, "white"), cb(0.9, 0.18, 0.55, 0.55, 0.38, 0.12, "white"),
 ];
 
 export const sofa3 = (): Cuboid[] => [
-  cb(0, 0, 0, 2.4, 0.95, 0.35, "blue"), cb(0, 0, 0.35, 2.4, 0.25, 0.55, "blue"),
-  cb(0, 0.25, 0.35, 0.22, 0.7, 0.28, "blue"), cb(2.18, 0.25, 0.35, 0.22, 0.7, 0.28, "blue"),
-  ...[0, 1, 2].map((i) => cb(0.22 + i * 0.653, 0.25, 0.35, 0.62, 0.7, 0.14, "white")),
+  cb(0, 0, 0, 2.4, 0.95, 0.35, "orange"), cb(0, 0, 0.35, 2.4, 0.25, 0.55, "orange"),
+  cb(0, 0.25, 0.35, 0.22, 0.7, 0.28, "orange"), cb(2.18, 0.25, 0.35, 0.22, 0.7, 0.28, "orange"),
+  ...[0, 1, 2].map((i) => cb(0.22 + i * 0.653, 0.25, 0.35, 0.62, 0.7, 0.14, "orangeL")),
 ];
 
-export const diningTable = (): Cuboid[] => [...legs(2, 1.1, 0.75), cb(0, 0, 0.75, 2, 1.1, 0.09, "wood")];
+const chair = (x: number, y: number, backAtFar: boolean): Cuboid[] => [
+  cb(x, y, 0.38, 0.42, 0.42, 0.06, "wood"), cb(x + 0.06, y + 0.06, 0, 0.1, 0.1, 0.38, "wood"), cb(x + 0.26, y + 0.26, 0, 0.1, 0.1, 0.38, "wood"),
+  cb(x, backAtFar ? y : y + 0.36, 0.44, 0.42, 0.06, 0.5, "wood"),
+];
+
+export const diningTable = (): Cuboid[] => [
+  ...legs(2, 1.1, 0.75), cb(0, 0, 0.75, 2, 1.1, 0.09, "wood"),
+  ...chair(0.25, -0.5, true), ...chair(1.3, -0.5, true), ...chair(0.25, 1.15, false), ...chair(1.3, 1.15, false),
+];
+
+export const officeDesk = (): Cuboid[] => [
+  cb(0, 0, 0, 0.07, 0.9, 0.72, "wood"), cb(1.35, 0.05, 0, 0.65, 0.8, 0.72, "wood"), cb(0, 0, 0.72, 2, 0.9, 0.07, "wood"),
+];
+
+export const washerDryer = (): Cuboid[] => [
+  cb(0, 0, 0, 0.9, 0.85, 0.9, "steel"), cb(0.2, 0.85, 0.2, 0.5, 0.03, 0.5, "slate"), cb(0.1, 0.85, 0.78, 0.7, 0.03, 0.06, "grey"),
+  cb(0, 0, 0.9, 0.9, 0.85, 0.9, "steel"), cb(0.2, 0.85, 1.1, 0.5, 0.03, 0.5, "slate"), cb(0.1, 0.85, 1.68, 0.7, 0.03, 0.06, "grey"),
+];
 
 const boxLayouts: Record<number, Array<[number, number, number]>> = {
   5: [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0], [0, 0, 1]],

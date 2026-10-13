@@ -41,7 +41,7 @@ export const vehicles: readonly Vehicle[] = [
   {
     id: "h100",
     name: "Hyundai H100 bakkie",
-    tonnage: "Up to 1 ton",
+    tonnage: "1.3 ton",
     bestFor: "A few items, a student room or large appliances. Open dropside, so tall and awkward items load easily.",
     spec: `Open dropside: about ${H100_M3} m³ of load space`,
     capacityM3: H100_M3,
