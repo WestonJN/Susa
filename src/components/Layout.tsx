@@ -20,7 +20,7 @@ function Logo() {
 
 const nav = [
   { label: "Home moving", to: "/services/home-moving/" },
-  { label: "Truck hire", to: "/services/truck-hire/" },
+  { label: "Truck transport", to: "/services/truck-hire/" },
 ] as const;
 
 export function whatsappLink(message?: string): string | null {
@@ -50,7 +50,7 @@ export function Layout({ children }: { children: ReactNode }) {
               Get a quote
             </LinkButton>
             <details className="relative md:hidden">
-              <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-slate-300" aria-label="Menu">
+              <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-slate-300" aria-label="Open menu">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path d="M4 7h16M4 12h16M4 17h16" />
                 </svg>
@@ -101,8 +101,8 @@ export function Layout({ children }: { children: ReactNode }) {
               ))}
             </ul>
           </nav>
-          <nav aria-label="Company">
-            <div className="font-semibold text-white">Company</div>
+          <nav aria-label="Quotes and policies">
+            <div className="font-semibold text-white">Quotes and policies</div>
             <ul className="mt-2 space-y-1 text-sm">
               <li><a className="hover:underline" href={href("/get-quote/")}>Get a quote</a></li>
               <li><a className="hover:underline" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
@@ -110,7 +110,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <li><a className="hover:underline" href={href("/terms/")}>Terms of service</a></li>
               <li><a className="hover:underline" href={href("/cancellations/")}>Cancellations and refunds</a></li>
               <li><a className="hover:underline" href={href("/cookies/")}>Cookie policy</a></li>
-              <li><a className="hover:underline" href={href("/data-request/")}>Data request (delete or access)</a></li>
+              <li><a className="hover:underline" href={href("/data-request/")}>Your data: access, correct or delete</a></li>
             </ul>
           </nav>
         </Container>

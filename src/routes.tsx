@@ -30,8 +30,8 @@ export const routes: Route[] = [
   },
   {
     path: "/get-quote/",
-    title: `Get an Instant Moving Quote | ${site.name}`,
-    description: "Search your addresses, choose a truck and see your moving price build up live. Furniture removals and truck transport in Johannesburg.",
+    title: `Instant Moving Quote in Johannesburg | ${site.name}`,
+    description: "Enter your Johannesburg addresses, choose a bakkie or bakkie with trailer and see your moving estimate build up. Free to request, and not a booking.",
     priority: 0.9,
     changefreq: "monthly",
     jsonLd: [crumbs("Get a quote", "/get-quote/")],
@@ -41,11 +41,11 @@ export const routes: Route[] = [
     const path = `/services/${s.slug}/`;
     return {
       path,
-      title: `${s.name} in Johannesburg | ${site.name}`,
-      description: s.lead,
+      title: `${s.metaTitle} | ${site.name}`,
+      description: s.metaDescription,
       priority: 0.8,
       changefreq: "monthly",
-      jsonLd: [serviceLd(site, s.name, s.lead, path), crumbs(s.name, path)],
+      jsonLd: [serviceLd(site, s.name, s.metaDescription, path), crumbs(s.name, path)],
       element: <ServicePage slug={s.slug} />,
     };
   }),
@@ -54,7 +54,7 @@ export const routes: Route[] = [
     return {
       path,
       title: `Movers & Truck Transport in ${a.name} | ${site.name}`,
-      description: `Furniture removals and truck transport in ${a.name}. Pick your truck, see the price build up and request a quote online.`,
+      description: `Furniture removals and truck transport in ${a.name}. Choose a bakkie or bakkie with trailer, see your estimate build up and request a free quote online.`,
       priority: 0.7,
       changefreq: "monthly",
       jsonLd: [serviceLd(site, `Moving services in ${a.name}`, a.intro, path, `${a.name}, Gauteng, South Africa`), crumbs(`Movers in ${a.name}`, path)],
@@ -64,7 +64,7 @@ export const routes: Route[] = [
   {
     path: "/drive-with-us/",
     title: `Drive With Us (Coming Soon) | ${site.name}`,
-    description: "Driver partnerships are coming soon.",
+    description: "Driver partnerships are coming soon. We are not taking driver applications yet. Meanwhile, you can get an estimate for a move in Johannesburg.",
     noindex: true,
     jsonLd: [crumbs("Drive with us", "/drive-with-us/")],
     element: <DriveWithUs />,
@@ -72,7 +72,7 @@ export const routes: Route[] = [
   {
     path: "/privacy/",
     title: `Privacy Notice (POPIA) | ${site.name}`,
-    description: `How ${site.name} collects, uses and protects personal information under POPIA.`,
+    description: `How ${site.name} collects and uses your personal information when you request a quote in Johannesburg, and how to use your rights under POPIA.`,
     priority: 0.3,
     changefreq: "yearly",
     element: <Privacy />,
@@ -80,7 +80,7 @@ export const routes: Route[] = [
   {
     path: "/terms/",
     title: `Terms of Service | ${site.name}`,
-    description: `Plain-language terms for quotes, bookings and cover with ${site.name}.`,
+    description: `Plain-language terms for quotes, bookings and goods-in-transit cover with ${site.name}, a furniture removal and truck transport service in Johannesburg.`,
     priority: 0.3,
     changefreq: "yearly",
     element: <Terms />,
@@ -88,7 +88,7 @@ export const routes: Route[] = [
   {
     path: "/cancellations/",
     title: `Cancellation & Refund Policy | ${site.name}`,
-    description: `How cancellations, rescheduling and refunds work with ${site.name}.`,
+    description: `How cancelling, rescheduling and refunds work when you book a furniture removal or truck transport job with ${site.name} in Johannesburg.`,
     priority: 0.3,
     changefreq: "yearly",
     element: <Cancellations />,
@@ -96,15 +96,15 @@ export const routes: Route[] = [
   {
     path: "/cookies/",
     title: `Cookie Policy | ${site.name}`,
-    description: `${site.name} does not use cookies or tracking on this website.`,
+    description: `${site.name} does not use cookies, analytics or advertising trackers on this website. Read what your browser may still share and why there is no cookie banner.`,
     priority: 0.2,
     changefreq: "yearly",
     element: <Cookies />,
   },
   {
     path: "/data-request/",
-    title: `Data Request (POPIA) | ${site.name}`,
-    description: "Ask to delete, correct or receive a copy of your personal information.",
+    title: `Your Data Request (POPIA) | ${site.name}`,
+    description: `Ask ${site.name} to delete, correct or send you a copy of the personal information we hold about you. A POPIA data request for Johannesburg customers.`,
     priority: 0.2,
     changefreq: "yearly",
     element: <DataRequest />,
@@ -114,7 +114,7 @@ export const routes: Route[] = [
 export const notFoundRoute: Route = {
   path: "/404/",
   title: `Page not found | ${site.name}`,
-  description: "This page could not be found.",
+  description: "We could not find that page. Go to the home page, or get an estimate for a furniture removal or truck transport job in Johannesburg.",
   noindex: true,
   element: <NotFound />,
 };

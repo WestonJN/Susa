@@ -11,7 +11,7 @@ import { LoadAssistant } from "./LoadAssistant";
 import { AddressSearch } from "./AddressSearch";
 import { quickDistanceKm, routeDistanceKm, type Place } from "../../lib/geo";
 
-const STEPS = ["Route", "Truck", "Move details", "When", "Review"] as const;
+const STEPS = ["Route", "Vehicle", "Move details", "When", "Review"] as const;
 const WINDOWS = ["Early morning (06:00 to 09:00)", "Morning (09:00 to 12:00)", "Afternoon (12:00 to 16:00)", "Flexible"] as const;
 
 interface FormState {
@@ -65,20 +65,20 @@ type Errors = Partial<Record<keyof FormState, string>>;
 function validate(step: number, s: FormState): Errors {
   const e: Errors = {};
   if (step === 0) {
-    if (clean(s.pickup).length < 5) e.pickup = "Enter the pick-up address or suburb.";
-    if (clean(s.dropoff).length < 5) e.dropoff = "Enter the drop-off address or suburb.";
+    if (clean(s.pickup).length < 5) e.pickup = "Enter your pick-up street and suburb.";
+    if (clean(s.dropoff).length < 5) e.dropoff = "Enter your drop-off street and suburb.";
     const km = Number(s.distanceKm);
-    if (!s.distanceKm || !Number.isFinite(km) || km <= 0 || km > 150) e.distanceKm = "Enter the approximate driving distance in km (we currently serve Johannesburg only).";
+    if (!s.distanceKm || !Number.isFinite(km) || km <= 0 || km > 150) e.distanceKm = "Enter the driving distance in km, up to 150. We move within Johannesburg only.";
   }
-  if (step === 1 && !s.vehicleId) e.vehicleId = "Choose a truck, or use the load assistant.";
+  if (step === 1 && !s.vehicleId) e.vehicleId = "Choose the bakkie or the bakkie with trailer, or use the load assistant.";
   if (step === 3) {
-    if (!isFutureOrToday(s.date, todayIso())) e.date = "Choose today or a future date.";
+    if (!isFutureOrToday(s.date, todayIso())) e.date = "Pick the date of your move, today or later.";
   }
   if (step === 4) {
     if (clean(s.name, 100).length < 2) e.name = "Enter your name.";
-    if (!normaliseZaPhone(s.phone)) e.phone = "Enter a valid South African number, e.g. 082 123 4567.";
-    if (s.email && !isEmail(s.email.trim())) e.email = "That email address does not look right.";
-    if (!s.consent) e.consent = "Please accept the privacy notice so we can contact you.";
+    if (!normaliseZaPhone(s.phone)) e.phone = "Enter a South African mobile number, like 082 123 4567.";
+    if (s.email && !isEmail(s.email.trim())) e.email = "Check your email address. It should look like name@example.com.";
+    if (!s.consent) e.consent = "Tick the box to confirm you are 18 or older and agree to the privacy notice and terms.";
   }
   return e;
 }
@@ -114,7 +114,7 @@ export function QuoteForm() {
     routeDistanceKm(pickupPlace, dropoffPlace).then((r) => {
       if (cancelled) return;
       setS((prev) => ({ ...prev, distanceKm: String(r.km) }));
-      setRouteNote(r.estimated ? "Estimated from the map (road routing was unavailable). Please check it." : "Driving distance between your two addresses.");
+      setRouteNote(r.estimated ? "Estimated from the map because road routing is unavailable. Please check the distance." : "Driving distance between your two addresses.");
     });
     return () => {
       cancelled = true;
@@ -151,10 +151,14 @@ export function QuoteForm() {
       "Quote request",
       `From: ${clean(s.pickup)}`,
       `To: ${clean(s.dropoff)} (about ${s.distanceKm} km)`,
-      `Truck: ${v?.name ?? "not chosen"} x ${s.trips} trip(s), ${getTier(s.tier).name}`,
+      `Vehicle: ${v?.name ?? "not chosen"} x ${s.trips} trip(s), ${getTier(s.tier).name}`,
       `Extra helpers: ${s.helpers}, floors: ${s.floors}`,
       `Date: ${s.date}, ${s.window}`,
-      quote.status !== "incomplete" ? `Estimate: ${formatZar(quote.total)}` : "",
+      s.cover ? "Goods-in-transit cover: requested" : "",
+      quote.status !== "incomplete" ? `Online estimate: ${formatZar(quote.total)} (not confirmed)` : "",
+      `Name: ${clean(s.name, 100)}`,
+      `Mobile: ${clean(s.phone, 20)}`,
+      s.email.trim() ? `Email: ${clean(s.email, 254)}` : "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -205,10 +209,10 @@ export function QuoteForm() {
       <div className="rounded-2xl bg-white p-6 shadow-sm" role="status">
         <h2 className="text-2xl font-bold text-brand-900">Request received</h2>
         <p className="mt-2 text-slate-700">
-          Thanks {clean(s.name, 100).split(" ")[0]}. Our team will confirm availability and your final price before anything is booked. You have not been charged.
+          Thanks {clean(s.name, 100).split(" ")[0]}. Our team will check availability and contact you to confirm your final price. Nothing is booked until that is agreed, and you have not been charged.
         </p>
-        {reference && reference !== "pending" && <p className="mt-3 text-sm text-slate-600">Reference: <strong>{reference}</strong></p>}
-        <a className="mt-6 inline-block font-semibold text-brand-600 underline" href={href("/")}>Back to home</a>
+        {reference && reference !== "pending" && <p className="mt-3 text-sm text-slate-600">Your reference: <strong>{reference}</strong>. Keep it in case you ask about this request.</p>}
+        <a className="mt-6 inline-block font-semibold text-brand-600 underline" href={href("/")}>Back to the home page</a>
       </div>
     );
   }
@@ -217,17 +221,22 @@ export function QuoteForm() {
     const wa = whatsappLink(summaryText());
     return (
       <div className="rounded-2xl bg-white p-6 shadow-sm" role="status">
-        <h2 className="text-2xl font-bold text-brand-900">Send us your request</h2>
-        <p className="mt-2 text-slate-700">Online booking is not switched on yet. Send these details to our team and we will confirm your price and availability.</p>
+        <h2 className="text-2xl font-bold text-brand-900">One more step: send your request</h2>
+        <p className="mt-2 text-slate-700">
+          {wa || site.email
+            ? `Your request has not been sent yet. Use ${wa && site.email ? "a button" : "the button"} below to open ${wa && site.email ? "WhatsApp or your email app" : wa ? "WhatsApp" : "your email app"} with these details filled in, then press send there. Our team will check availability and contact you to confirm your final price. You have not been charged.`
+            : "We cannot receive requests through this page right now, so your details have not been sent. Please try again later."}
+        </p>
         <pre className="mt-4 whitespace-pre-wrap rounded-xl bg-slate-100 p-4 text-sm">{summaryText()}</pre>
         <div className="mt-4 flex flex-wrap gap-3">
-          {wa && <a className="inline-flex min-h-12 items-center rounded-xl bg-[#25D366] px-5 font-semibold text-white" href={wa} rel="noopener">Send on WhatsApp</a>}
+          {wa && <a className="inline-flex min-h-12 items-center rounded-xl bg-[#25D366] px-5 font-semibold text-white" href={wa} rel="noopener">Open WhatsApp with my request</a>}
           {site.email && (
             <a className="inline-flex min-h-12 items-center rounded-xl border border-slate-300 px-5 font-semibold" href={`mailto:${site.email}?subject=${encodeURIComponent("Quote request")}&body=${encodeURIComponent(summaryText())}`}>
-              Send by email
+              Open email with my request
             </a>
           )}
         </div>
+        {(wa || site.email) && <p className="mt-3 text-sm text-slate-600">Our team only receives your request once you press send.</p>}
       </div>
     );
   }
@@ -282,7 +291,7 @@ export function QuoteForm() {
           <div className="space-y-5">
             <div>
               <h2 className="text-xl font-bold text-brand-900">Where are you moving?</h2>
-              <p className="mt-1 text-sm text-slate-600">We currently move within Johannesburg only. Search for each address and pick it from the list.</p>
+              <p className="mt-1 text-sm text-slate-600">We currently move within Johannesburg only. Search for each address, then pick it from the list.</p>
             </div>
             <AddressSearch
               id="pickup"
@@ -322,7 +331,7 @@ export function QuoteForm() {
                   }}
                 />
               </Field>
-              <Field label="Toll costs, if any (R)" htmlFor="toll" hint="Optional. Leave blank if unsure.">
+              <Field label="Toll costs, if any (rand)" htmlFor="toll" hint="Optional. Add the tolls you expect, or leave blank if unsure.">
                 <input id="toll" className={inputClass} inputMode="numeric" value={s.tollEstimate} onChange={(e) => patch({ tollEstimate: e.target.value.replace(/\D/g, "").slice(0, 5) })} />
               </Field>
             </div>
@@ -331,9 +340,9 @@ export function QuoteForm() {
 
         {step === 1 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">Choose your truck</h2>
+            <h2 className="text-xl font-bold text-brand-900">Choose your vehicle</h2>
             <fieldset>
-              <legend className="sr-only">Truck</legend>
+              <legend className="sr-only">Vehicle</legend>
               <div className="grid gap-3 sm:grid-cols-2">
                 {vehicles.map((veh) => (
                   <label key={veh.id} className={`block cursor-pointer rounded-xl border-2 p-4 ${s.vehicleId === veh.id ? "border-brand-600 bg-brand-50" : "border-slate-200"}`}>
@@ -348,9 +357,10 @@ export function QuoteForm() {
               {errors.vehicleId && <p role="alert" className="mt-2 text-sm font-medium text-red-700">{errors.vehicleId}</p>}
             </fieldset>
             <div className="rounded-xl bg-slate-100 p-4">
-              <div className="font-semibold">Not sure which truck fits?</div>
+              <div className="font-semibold">Not sure which vehicle fits?</div>
+              <p className="mt-1 text-sm text-slate-600">Add your furniture and boxes and we will suggest one.</p>
               <Button variant="ghost" className="mt-2 w-full" onClick={() => setAssistant(true)}>
-                Use load assistant
+                Add items with the load assistant
               </Button>
             </div>
           </div>
@@ -373,9 +383,9 @@ export function QuoteForm() {
             </fieldset>
             <Counter label="Additional helpers" hint="On top of any crew in your service level." value={s.helpers} max={10} onChange={(n) => patch({ helpers: n })} />
             <Counter label="Floors (stairs, no lift)" hint="Count floors the crew must carry up or down." value={s.floors} max={20} onChange={(n) => patch({ floors: n })} />
-            <Counter label="Number of trips" value={s.trips} min={1} max={10} onChange={(n) => patch({ trips: n })} />
+            <Counter label="Number of trips" hint="Use more than one if your load will not fit in one go." value={s.trips} min={1} max={10} onChange={(n) => patch({ trips: n })} />
             <button type="button" className="font-semibold text-brand-600 underline" onClick={() => setAssistant(true)}>
-              Add your inventory for a more accurate quote
+              Add your items for a closer estimate
             </button>
           </div>
         )}
@@ -383,10 +393,10 @@ export function QuoteForm() {
         {step === 3 && (
           <div className="space-y-5">
             <h2 className="text-xl font-bold text-brand-900">When do you need us?</h2>
-            <Field label="Date of move" htmlFor="date" error={errors.date}>
+            <Field label="Date of move" htmlFor="date" error={errors.date} hint="Our team confirms this date is available.">
               <input id="date" type="date" min={minDate} className={inputClass} value={s.date} onChange={(e) => patch({ date: e.target.value })} />
             </Field>
-            <Field label="Arrival window" htmlFor="window">
+            <Field label="Preferred arrival window" htmlFor="window" hint="Our team confirms the actual time with you.">
               <select id="window" className={inputClass} value={s.window} onChange={(e) => patch({ window: e.target.value })}>
                 {WINDOWS.map((w) => (
                   <option key={w}>{w}</option>
@@ -397,7 +407,7 @@ export function QuoteForm() {
               <input type="checkbox" className="mt-1 h-5 w-5" checked={s.cover} onChange={(e) => patch({ cover: e.target.checked })} />
               <span>
                 <span className="font-semibold">Request goods-in-transit cover</span>
-                <span className="block text-sm text-slate-600">Subject to approved cover for the declared value. Limits, exclusions and full terms apply.</span>
+                <span className="block text-sm text-slate-600">Tick this if you want cover. Our team tells you whether it is available, with its limits and exclusions, before you book.</span>
               </span>
             </label>
           </div>
@@ -405,17 +415,18 @@ export function QuoteForm() {
 
         {step === 4 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">Review and send</h2>
+            <h2 className="text-xl font-bold text-brand-900">Review and request your quote</h2>
+            <p className="-mt-3 text-sm text-slate-600">Check your details, then add how we can reach you. This is a request, not a booking, and it is free.</p>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-xl bg-slate-50 p-4 text-sm">
               <dt className="text-slate-500">From</dt><dd>{clean(s.pickup)}</dd>
               <dt className="text-slate-500">To</dt><dd>{clean(s.dropoff)}</dd>
-              <dt className="text-slate-500">Truck</dt><dd>{v?.name} x {s.trips}, {getTier(s.tier).name}</dd>
+              <dt className="text-slate-500">Vehicle</dt><dd>{v?.name} x {s.trips}, {getTier(s.tier).name}</dd>
               <dt className="text-slate-500">When</dt><dd>{s.date}, {s.window}</dd>
             </dl>
             <Field label="Your name" htmlFor="name" error={errors.name}>
               <input id="name" className={inputClass} autoComplete="name" maxLength={100} value={s.name} onChange={(e) => patch({ name: e.target.value })} />
             </Field>
-            <Field label="Mobile number" htmlFor="phone" error={errors.phone}>
+            <Field label="Mobile number" htmlFor="phone" error={errors.phone} hint="Our team uses this to confirm your move.">
               <input id="phone" className={inputClass} type="tel" inputMode="tel" autoComplete="tel" value={s.phone} onChange={(e) => patch({ phone: e.target.value })} placeholder="082 123 4567" />
             </Field>
             <Field label="Email (optional)" htmlFor="email" error={errors.email}>
@@ -434,7 +445,7 @@ export function QuoteForm() {
               </label>
               {errors.consent && <p role="alert" className="mt-1 text-sm font-medium text-red-700">{errors.consent}</p>}
             </div>
-            {status === "error" && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">We could not send your request. Please check your connection and try again.</p>}
+            {status === "error" && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-800">Your request did not go through. Check your connection and press the button again.</p>}
           </div>
         )}
 
@@ -446,7 +457,7 @@ export function QuoteForm() {
             <Button className="flex-1" onClick={next}>Continue</Button>
           ) : (
             <Button className="flex-1" disabled={status === "sending"} onClick={submit}>
-              {status === "sending" ? "Sending…" : "Send quote request"}
+              {status === "sending" ? "Sending…" : "Request my quote"}
             </Button>
           )}
         </div>
@@ -455,7 +466,7 @@ export function QuoteForm() {
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur" aria-live="polite">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           {quote.status === "incomplete" ? (
-            <p className="text-sm text-slate-600">Add your route and truck to see a live estimate.</p>
+            <p className="text-sm text-slate-600">Add your route and vehicle to see your estimate.</p>
           ) : (
             <>
               <div>
@@ -471,9 +482,9 @@ export function QuoteForm() {
                   {site.vatRegistered && <li className="flex justify-between gap-3"><span>VAT</span><span className="tabular-nums">{formatZar(quote.vat)}</span></li>}
                 </ul>
                 {quote.status === "needs_review" && (
-                  <p className="mt-2 text-left text-amber-700">Our team will confirm this price. {quote.reasons[0]}</p>
+                  <p className="mt-2 text-left text-amber-700">Our team will check this price before confirming it. {quote.reasons[0]}</p>
                 )}
-                <p className="mt-2 text-left text-xs text-slate-500">Excludes packing and dismantling unless you chose Full service. Final price is confirmed by our team.</p>
+                <p className="mt-2 text-left text-xs text-slate-500">This is an estimate. It excludes packing and dismantling unless you chose Full service. Our team confirms the final price.</p>
               </details>
             </>
           )}

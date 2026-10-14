@@ -4,14 +4,20 @@ import { Container } from "../components/ui";
 import { href } from "../lib/url";
 
 const contact = () => site.email || "the contact details on this website";
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+/** "2026-10-13" becomes "13 October 2026" without relying on the runtime locale. */
+const updated = () => {
+  const [y, m, d] = site.consentVersion.split("-").map(Number);
+  return y && m && d ? `${d} ${MONTHS[m - 1]} ${y}` : site.consentVersion;
+};
 const H = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-bold text-brand-900">{children}</h2>;
 const A = ({ to, children }: { to: string; children: ReactNode }) => <a className="font-semibold text-brand-600 underline" href={href(to)}>{children}</a>;
 const Page = ({ title, children }: { title: string; children: ReactNode }) => (
   <Container className="max-w-3xl py-10 sm:py-14">
     <h1 className="text-3xl font-extrabold text-brand-900">{title}</h1>
-    <p className="mt-2 text-sm text-slate-600">Last updated {site.consentVersion}</p>
+    <p className="mt-2 text-sm text-slate-600">Last updated {updated()}</p>
     <div className="mt-6 space-y-5 text-slate-700">{children}</div>
-    <p className="mt-8 text-sm text-slate-600">This is a plain-language policy and should be reviewed by a legal adviser before launch.</p>
+    <p className="mt-8 text-sm text-slate-600">Questions about this page? Contact {contact()}.</p>
   </Container>
 );
 
@@ -42,7 +48,7 @@ export function Privacy() {
         <ul className="list-disc space-y-1 pl-5">
           <li>Your name, mobile number and optional email, to contact you about your quote and move.</li>
           <li>Pick-up and drop-off addresses, move date and inventory, to price and plan your move.</li>
-          <li>Technical data such as your IP address, used for security and abuse prevention.</li>
+          <li>Technical data such as your IP address, which the services that host this site and power the address search receive when you use them.</li>
         </ul>
         <p className="mt-2">We collect only what we need for the quote and the move. We do not ask for your ID number, banking details or payment card through this website.</p>
       </section>
@@ -129,15 +135,15 @@ export function Cancellations() {
       <p>This policy applies to bookings confirmed with {site.name}. Requesting a quote is free and creates no obligation.</p>
       <section>
         <H>Cancelling or rescheduling</H>
-        <p>Tell us as early as you can, by email or WhatsApp. Your booking confirmation sets out the exact cancellation window and any fee that applies. We will not charge a fee that was not in your confirmation.</p>
+        <p>Tell us as early as you can, using the contact details on this website. Your booking confirmation sets out the cancellation window and any fee that applies. We will not charge a fee that is not in your confirmation.</p>
       </section>
       <section>
         <H>Refunds</H>
-        <p>If you pay a deposit and cancel within the window in your confirmation, the deposit is refunded in full to the account you paid from, normally within 7 working days. If we cancel or cannot do the move, you get a full refund and we will help you find another date.</p>
+        <p>If you pay a deposit and cancel within the window in your confirmation, the deposit is refunded in full to the account you paid from. Your confirmation says when. If we cancel or cannot do your move, we refund everything you have paid and help you find another date.</p>
       </section>
       <section>
         <H>If something goes wrong</H>
-        <p>Report any damage or problem as soon as possible, ideally on the day, with photos, to {contact()}. We will review it and respond in writing. This policy does not limit your rights under the Consumer Protection Act.</p>
+        <p>Tell {contact()} about any damage or problem as soon as you can, ideally on the day, and include photos. We will review it and reply in writing. This policy does not limit your rights under the Consumer Protection Act.</p>
       </section>
     </Page>
   );

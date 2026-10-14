@@ -59,8 +59,8 @@ export function BakkieArt() {
 
 export function ComboArt() {
   return (
-    <svg viewBox="0 0 660 190" role="img" aria-label="Illustration: the same bakkie towing a closed medium trailer" className="h-auto w-full">
-      <title>H100 bakkie towing a closed medium trailer</title>
+    <svg viewBox="0 0 660 190" role="img" aria-label="Illustration: the same bakkie towing a closed box trailer" className="h-auto w-full">
+      <title>H100 bakkie towing a closed box trailer</title>
       <line x1={0} y1={187} x2={660} y2={187} stroke="#c3d3e3" strokeWidth={2} />
       <Trailer />
       <Bakkie x={260} />

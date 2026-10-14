@@ -38,14 +38,14 @@ export function LoadAssistant({
           <h2 id="load-assistant-title" className="text-lg font-bold text-brand-900">
             Household load assistant
           </h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="h-10 w-10 rounded-lg text-2xl hover:bg-slate-100">
+          <button type="button" onClick={onClose} aria-label="Close load assistant" className="h-10 w-10 rounded-lg text-2xl hover:bg-slate-100">
             ×
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           <p className="py-3 text-sm text-slate-600">
-            Add what you are moving and we will suggest the bakkie or the bakkie with a trailer. This is optional, and your quote only changes when you apply the suggestion.
+            Add what you are moving and we will suggest the bakkie or the bakkie with trailer. This is optional, and your estimate only changes when you use the suggestion. Sizes are rough, and our team confirms the final plan.
           </p>
           {itemGroups.map((g) => (
             <fieldset key={g.id} className="mb-4 rounded-xl border border-slate-200 px-3 pb-2">
@@ -65,7 +65,7 @@ export function LoadAssistant({
         <div className="border-t border-slate-200 bg-white p-4">
           <dl className="mb-3 grid grid-cols-3 gap-2 text-sm">
             <div>
-              <dt className="text-slate-500">Truck</dt>
+              <dt className="text-slate-500">Vehicle</dt>
               <dd className="font-semibold">{vehicle ? vehicle.name : "Add items"}</dd>
             </div>
             <div>
@@ -73,13 +73,13 @@ export function LoadAssistant({
               <dd className="font-semibold">{rec.volumeM3.toFixed(1)} m³</dd>
             </div>
             <div>
-              <dt className="text-slate-500">Helpers</dt>
+              <dt className="text-slate-500">Extra helpers</dt>
               <dd className="font-semibold">{rec.helpers}</dd>
             </div>
           </dl>
-          {rec.trips > 1 && <p className="mb-2 text-sm text-amber-700">This load needs about {rec.trips} trips with the bakkie and trailer.</p>}
+          {rec.trips > 1 && <p className="mb-2 text-sm text-amber-700">This load needs about {rec.trips} trips with the bakkie and trailer. Our team will confirm the plan.</p>}
           <Button className="w-full" disabled={!vehicle} onClick={() => onApply(rec)}>
-            Apply suggestion
+            Use this suggestion
           </Button>
         </div>
       </div>

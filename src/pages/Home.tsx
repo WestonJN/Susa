@@ -1,22 +1,24 @@
-import { site } from "../config/site";
 import { areas } from "../content/areas";
 import { href } from "../lib/url";
 import { Container, LinkButton, Section } from "../components/ui";
 import { FleetShowcase } from "../components/fleet/FleetShowcase";
 
 const steps = [
-  { t: "Search your addresses", d: "Type the pick-up and drop-off and pick them from the list. We work out the distance for you." },
-  { t: "Choose your vehicle", d: "Pick the bakkie or bakkie with trailer, or add your furniture and let the load assistant suggest one." },
-  { t: "See the price build up", d: "Distance, crew, stairs and tolls are itemised as you go." },
-  { t: "We confirm your booking", d: "A real person checks availability and your final price before anything is locked in." },
+  { t: "Add your addresses", d: "Type the pick-up and drop-off, then pick each one from the list. We work out the driving distance for you." },
+  { t: "Choose your vehicle", d: "Pick the bakkie or the bakkie with trailer. Or add your furniture and let the load assistant suggest one." },
+  { t: "Watch your estimate build up", d: "Distance, crew, stairs and any tolls you add are itemised as you go." },
+  { t: "Send your request", d: "Our team checks availability and confirms your final price before anything is booked. Asking for a quote is free." },
 ];
 
 const faqs = [
-  { q: "Is the online price final?", a: "It is a transparent estimate. Our team confirms availability and the final price before your booking is locked in, and you are not charged when you request a quote." },
-  { q: "Does the quote include packing?", a: "Packing, wrapping and dismantling are only included on the Full service option, or if you arrange them separately with us." },
-  { q: "How do I know which truck I need?", a: "Use the load assistant: add your furniture and boxes and it suggests the smallest truck that fits, plus how many helpers to bring." },
-  { q: "Do you move offices as well as homes?", a: "Yes. Small office relocations and commercial deliveries use the same quote flow." },
-  { q: "Is my personal information safe?", a: "We only collect what we need to quote and run your move, protect it, and handle it under POPIA. Read the privacy notice for details and your rights." },
+  { q: "Is the online price final?", a: "No. It is an estimate. Our team confirms availability and the final price before your booking is locked in. Asking for a quote is free and you are not charged." },
+  { q: "What happens after I send my request?", a: "Once we receive it, our team checks availability and contacts you to confirm the final price. Your move is booked only when that is agreed. Depending on how you send it, you may need to press send in WhatsApp or your email app." },
+  { q: "Which vehicles do you use?", a: "One Hyundai H100 dropside bakkie (1.3 ton), on its own or towing a closed box trailer that is specifically designed for furniture transport." },
+  { q: "How do I know which vehicle I need?", a: "Use the load assistant. Add your furniture and boxes and it suggests the bakkie or the bakkie with trailer, and how many helpers to add." },
+  { q: "Does the quote include packing?", a: "Packing, wrapping and dismantling are included only in the Full service option. If you want them without Full service, ask our team when you send your request." },
+  { q: "Do you move offices as well as homes?", a: "Yes, small offices and business deliveries that fit the bakkie or the bakkie with trailer. Bigger loads can be split over several trips. You use the same quote form." },
+  { q: "Do you move outside Johannesburg?", a: "Not yet. We currently move within the City of Johannesburg only." },
+  { q: "How do you handle my personal information?", a: "We collect only what we need to prepare your quote and plan your move, and we handle it under POPIA. Read the privacy notice for details and your rights." },
 ];
 
 export function Home() {
@@ -29,10 +31,10 @@ export function Home() {
             Furniture removals in Johannesburg, with a clear price estimate.
           </h1>
           <p className="mt-4 max-w-xl text-lg text-slate-200">
-            Search your addresses, choose the right vehicle, see how your estimate is built, and send your request in minutes from your phone.
+            Add your addresses, choose a bakkie or a bakkie with trailer, see how your estimate is built and send your request from your phone.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <LinkButton href={href("/get-quote/")}>Get an instant quote</LinkButton>
+            <LinkButton href={href("/get-quote/")}>Get a quote</LinkButton>
             <LinkButton href={href("/services/home-moving/")} variant="ghost" className="!bg-transparent !text-white !border-white/40 hover:!bg-white/10">
               How home moving works
             </LinkButton>
@@ -58,11 +60,11 @@ export function Home() {
 
       <Section>
         <p className="text-slate-600">
-          Also available: <a className="font-semibold text-brand-600 underline" href={href("/services/truck-hire/")}>truck transport</a> for furniture deliveries, donations and large items.
+          Need to move just one or two items? We also do <a className="font-semibold text-brand-600 underline" href={href("/services/truck-hire/")}>truck transport and furniture delivery</a>, donation runs and large items.
         </p>
       </Section>
 
-      <Section id="areas" title="Where we operate" intro="We currently move homes and offices within Johannesburg only. Local access rules matter, so we share what to expect." tone="white">
+      <Section id="areas" title="Where we move" intro="We currently move homes and small offices within Johannesburg only. Access rules differ from building to building, so we share what to expect." tone="white">
         <ul className="flex flex-wrap gap-2">
           {areas[0]?.nearby.map((n) => (
             <li key={n} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">{n}</li>
@@ -83,7 +85,7 @@ export function Home() {
           ))}
         </div>
         <div className="mt-8">
-          <LinkButton href={href("/get-quote/")}>Start your quote with {site.name}</LinkButton>
+          <LinkButton href={href("/get-quote/")}>Get a quote</LinkButton>
         </div>
       </Section>
     </>

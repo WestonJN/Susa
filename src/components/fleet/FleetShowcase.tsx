@@ -11,17 +11,17 @@ const photo = (name: string) => Object.entries(photos).find(([p]) => new RegExp(
 
 interface Example { label: string; blocks: Cuboid[]; alt: string }
 const bakkieExamples: Example[] = [
-  { label: "Single Mattress", blocks: mattress(), alt: "Single mattress" },
-  { label: "Student Desk", blocks: studentDesk(), alt: "Student desk" },
-  { label: "5 Medium Boxes", blocks: boxes(5), alt: "5 medium boxes" },
-  { label: "Washing Machine and Tumble Dryer", blocks: washerDryer(), alt: "Washing machine and tumble dryer" },
+  { label: "Single mattress", blocks: mattress(), alt: "Single mattress" },
+  { label: "Student desk", blocks: studentDesk(), alt: "Student desk" },
+  { label: "5 medium boxes", blocks: boxes(5), alt: "5 medium boxes" },
+  { label: "Washing machine and tumble dryer", blocks: washerDryer(), alt: "Washing machine and tumble dryer" },
 ];
 const comboExamples: Example[] = [
-  { label: "Queen Size Bed", blocks: queenBed(), alt: "Queen size bed" },
-  { label: "3-Seater Sofa", blocks: sofa3(), alt: "3-seater sofa" },
-  { label: "10 Medium Boxes", blocks: boxes(10), alt: "10 medium boxes" },
-  { label: "Dining Table and Chairs", blocks: diningTable(), alt: "Dining table and chairs" },
-  { label: "Office Desk", blocks: officeDesk(), alt: "Office desk" },
+  { label: "Queen-size bed", blocks: queenBed(), alt: "Queen-size bed" },
+  { label: "3-seater sofa", blocks: sofa3(), alt: "3-seater sofa" },
+  { label: "10 medium boxes", blocks: boxes(10), alt: "10 medium boxes" },
+  { label: "Dining table and chairs", blocks: diningTable(), alt: "Dining table and chairs" },
+  { label: "Office desk", blocks: officeDesk(), alt: "Office desk" },
 ];
 
 function Panel({ title, art, examples, callout, cols }: { title: string; art: ReactNode; examples: Example[]; callout: ReactNode; cols: string }) {
@@ -57,7 +57,7 @@ export function FleetShowcase() {
         <p className="text-sm font-semibold uppercase tracking-widest text-brand-500">Our vehicles</p>
         <h2 id="fleet-title" className="mt-2 text-3xl font-extrabold tracking-tight text-brand-900 sm:text-4xl">H100 Workhorse &amp; Trailer</h2>
         <p className="mt-3 max-w-2xl text-slate-600">
-          Our Hyundai H100 Workhorse does the small jobs on its own. Add the trailer, specifically designed for furniture transport, when there is more to move. Bigger moves are done in several trips.
+          Our Hyundai H100 Workhorse does the small jobs on its own. Add the trailer, specifically designed for furniture transport, when there is more to move. Bigger moves can be split over several trips.
         </p>
 
         <div className="relative mt-8 grid gap-4 lg:grid-cols-2 lg:gap-8">
@@ -76,15 +76,15 @@ export function FleetShowcase() {
           </div>
           <Panel
             title="H100 bakkie + custom box trailer" cols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5"
-            art={img(photo("bakkie-trailer"), "The same H100 bakkie towing a matching closed box trailer", <ComboArt />)}
+            art={img(photo("bakkie-trailer"), "The same H100 bakkie towing a closed box trailer", <ComboArt />)}
             examples={comboExamples}
             callout={<><strong>EXPANDED CLOSED VOLUME:</strong> Perfect for one-bedroom homes, apartments, or bulky furniture requiring weather protection.</>}
           />
         </div>
         <p className="mt-3 text-xs text-slate-600">
-          Examples show what fits, not one combined load. Sizes are estimates and your quote is confirmed by our team before anything is booked.
+          Each panel shows examples of what fits, not one combined load. Sizes are estimates. Our team confirms your plan and final price before anything is booked.
         </p>
-        <div className="mt-6"><LinkButton href={href("/get-quote/")}>Get an instant quote</LinkButton></div>
+        <div className="mt-6"><LinkButton href={href("/get-quote/")}>Get a quote</LinkButton></div>
       </Container>
     </section>
   );

@@ -108,14 +108,14 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
 
   const showPanel = open && searched && !loading;
   const status = resolveFailed
-    ? "We could not locate that address. Try another suggestion, or type the distance yourself"
+    ? "We could not find that address on the map. Try another suggestion, or type the distance yourself."
     : place
     ? "Address found on the map"
     : loading
       ? "Searching…"
       : value.trim().length >= 5
-        ? "Pick a suggestion so we can work out the distance for you"
-        : "Start typing the street and suburb";
+        ? "Pick a suggestion from the list so we can work out the distance"
+        : "Start typing the street and suburb, then pick it from the list";
 
   return (
     <div className="relative">
@@ -189,8 +189,8 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
           {results.length === 0 && (
             <li role="presentation" className="px-4 py-3 text-sm text-slate-600">
               {failed
-                ? "Address search is not available right now. Type the full address and enter the distance yourself."
-                : "No match in Johannesburg. Try the street and suburb, or type the full address."}
+                ? "Address search is not working right now. Type the full address and enter the distance yourself."
+                : "No match in Johannesburg. Try the street and suburb, or type the full address and enter the distance yourself."}
             </li>
           )}
         </ul>

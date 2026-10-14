@@ -64,14 +64,14 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     amount: transport,
   });
 
-  if (input.tollEstimate > 0) lines.push({ label: "Estimated tolls", amount: input.tollEstimate });
+  if (input.tollEstimate > 0) lines.push({ label: "Tolls (your figure)", amount: input.tollEstimate });
 
   const crew = tier.crew + helpers;
   if (crew > 0) {
     const baseHours = input.volumeM3 != null ? input.volumeM3 * 0.3 : 2;
     const hours = Math.max(2, Math.round((baseHours + floors * 0.25 + km / 80) * 2) / 2);
     lines.push({
-      label: `Crew: ${crew} x ${hours} h (estimate)`,
+      label: `Crew: ${crew} ${crew > 1 ? "people" : "person"} x ${hours} h (estimate)`,
       amount: crew * hours * rates.crewHourly * trips,
     });
     if (floors > 0) lines.push({ label: `Stairs: ${floors} floor${floors > 1 ? "s" : ""}`, amount: floors * rates.stairFeePerFloor });
@@ -82,36 +82,36 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
       lines.push({ label: "Packing and wrapping", amount: input.volumeM3 * rates.packingPerM3 });
     } else {
       confidence -= 0.3;
-      reasons.push("Packing is priced from your inventory. Use the load assistant so we can price it.");
+      reasons.push("Packing is priced from your items. Add them in the load assistant to include packing in the estimate.");
     }
   }
 
   let subtotal = lines.reduce((sum, l) => sum + l.amount, 0);
   if (subtotal < vehicle.minCharge) {
-    lines.push({ label: "Minimum charge adjustment", amount: vehicle.minCharge - subtotal });
+    lines.push({ label: "Minimum charge", amount: vehicle.minCharge - subtotal });
     subtotal = vehicle.minCharge;
   }
   subtotal = round10(subtotal);
 
   if (input.volumeM3 != null && input.volumeM3 > vehicle.capacityM3 * rates.loadEfficiency * trips) {
     confidence -= 0.4;
-    reasons.push("Your inventory may not fit the selected truck and trips.");
+    reasons.push("Your items may not fit the chosen vehicle and number of trips.");
   }
   if (trips > rates.maxAutoTrips) {
     confidence -= 0.3;
-    reasons.push("A move this big needs several trips, so our team will confirm the plan with you.");
+    reasons.push("This move needs several trips, so the plan needs a manual check.");
   }
   if (floors > rates.maxFloors) {
     confidence -= 0.2;
-    reasons.push("Access with many floors needs a quick manual check.");
+    reasons.push("Many floors need a manual check.");
   }
   if (km > rates.longDistanceKm) {
     confidence -= 0.3;
-    reasons.push("Routes this far outside Johannesburg are priced by our team.");
+    reasons.push("This route goes beyond Johannesburg, so the price needs a manual check.");
   }
   if (subtotal > vehicle.maxAutoQuote) {
     confidence = Math.min(confidence, 0.5);
-    reasons.push("This quote is above our automatic limit and will be confirmed by our team.");
+    reasons.push("This estimate is above the limit for automatic pricing.");
   }
 
   confidence = Math.max(0, Math.round(confidence * 100) / 100);

@@ -63,7 +63,6 @@ export function organizationLd(site: Site): JsonLd {
     ...(site.email ? { email: site.email } : {}),
     areaServed: { "@type": "City", name: "Johannesburg" },
     address: { "@type": "PostalAddress", addressLocality: "Johannesburg", addressRegion: "Gauteng", addressCountry: "ZA" },
-    priceRange: "$$",
   };
 }
 
