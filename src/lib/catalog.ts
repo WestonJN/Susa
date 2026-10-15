@@ -28,8 +28,8 @@ export interface Vehicle {
 /**
  * Sizing is anchored on the vehicle we run today: a 1.3 ton dropside bakkie plus a closed box trailer.
  * Deck length and width are the manufacturer's published figures (2 785 x 1 630 mm, 1 335 kg payload,
- * 1 250 kg braked towing limit). STILL ASSUMED, please measure: the practical stacking height on the
- * deck (the dropsides are only 355 mm, loads are stacked above them and tarped) and the trailer box.
+ * 1 250 kg braked towing limit). The 0.8 m stacking height on the deck (the dropsides are only 355 mm, loads are stacked above them
+ * and tarped) and the trailer box size are working figures set by the owner.
  * Add bigger classes here only when you actually own or partner for them.
  */
 export const BAKKIE_DECK = { lengthM: 2.785, widthM: 1.63, loadHeightM: 0.8 } as const;

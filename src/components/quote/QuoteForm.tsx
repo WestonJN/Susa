@@ -89,12 +89,28 @@ export function QuoteForm() {
   const [assistant, setAssistant] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "fallback" | "error">("idle");
   const [reference, setReference] = useState("");
-  const [key] = useState(newIdempotencyKey);
+  const [key, setKey] = useState(newIdempotencyKey);
   const [routeNote, setRouteNote] = useState("");
   const [distanceAuto, setDistanceAuto] = useState(false);
 
   const maxHelpers = Math.max(0, rates.maxCrew - getTier(s.tier).crew);
   const helpers = Math.min(s.helpers, maxHelpers);
+  function startOver() {
+    setS(initial);
+    setErrors({});
+    setStep(0);
+    setStatus("idle");
+    setReference("");
+    setRouteNote("");
+    setDistanceAuto(false);
+    setKey(newIdempotencyKey());
+    window.scrollTo({ top: 0 });
+  }
+  function editQuote(toStep: number) {
+    setStatus("idle");
+    setStep(toStep);
+    window.scrollTo({ top: 0 });
+  }
   const patch = (p: Partial<FormState>) => setS((prev) => ({ ...prev, ...p }));
 
   // Work out the driving distance as soon as both addresses were picked from the search.
@@ -209,7 +225,11 @@ export function QuoteForm() {
           Thanks {clean(s.name, 100).split(" ")[0]}. Our team will check availability and contact you to confirm your final price. Nothing is booked until that is agreed, and you have not been charged.
         </p>
         {reference && reference !== "pending" && <p className="mt-3 text-sm text-slate-600">Your reference: <strong>{reference}</strong>. Keep it in case you ask about this request.</p>}
-        <a className="mt-6 inline-block font-semibold text-brand-600 underline" href={href("/")}>Back to the home page</a>
+        <p className="mt-3 text-sm text-slate-600">Need to change or cancel this request? Contact us and quote your reference{reference && reference !== "pending" ? "" : " and your name"}.</p>
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <Button onClick={startOver}>Start a new quote</Button>
+          <a className="font-semibold text-brand-600 underline" href={href("/")}>Back to the home page</a>
+        </div>
       </div>
     );
   }
@@ -234,6 +254,14 @@ export function QuoteForm() {
           )}
         </div>
         {(wa || site.email) && <p className="mt-3 text-sm text-slate-600">Our team only receives your request once you press send.</p>}
+        <div className="mt-6 border-t border-slate-200 pt-4">
+          <p className="text-sm font-semibold text-brand-900">Changed your mind? Nothing has been sent yet, so there is nothing to undo.</p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <Button variant="ghost" onClick={() => editQuote(4)}>Edit my quote</Button>
+            <button type="button" className="min-h-11 px-1 font-semibold text-brand-600 underline" onClick={startOver}>Cancel and start again</button>
+            <a className="min-h-11 px-1 py-2 font-semibold text-slate-700 underline" href={href("/")}>Leave without sending</a>
+          </div>
+        </div>
       </div>
     );
   }
@@ -416,6 +444,11 @@ export function QuoteForm() {
               <dt className="text-slate-500">Vehicle</dt><dd>{v?.name} x {s.trips}, {getTier(s.tier).name}</dd>
               <dt className="text-slate-500">When</dt><dd>{s.date}, {s.window}</dd>
             </dl>
+            <div className="-mt-2 flex flex-wrap gap-x-4 text-sm">
+              {([["Edit route", 0], ["Edit vehicle", 1], ["Edit move details", 2], ["Edit date", 3]] as const).map(([label, to]) => (
+                <button key={label} type="button" className="min-h-11 font-semibold text-brand-600 underline" onClick={() => setStep(to)}>{label}</button>
+              ))}
+            </div>
             <Field label="Your name" htmlFor="name" error={errors.name}>
               <input id="name" className={inputClass} autoComplete="name" maxLength={100} value={s.name} onChange={(e) => patch({ name: e.target.value })} />
             </Field>
@@ -454,6 +487,15 @@ export function QuoteForm() {
             </Button>
           )}
         </div>
+        <p className="mt-3 text-center">
+          <button
+            type="button"
+            className="min-h-11 px-2 text-sm font-semibold text-slate-600 underline"
+            onClick={() => { if (window.confirm("Clear everything you entered and start again?")) startOver(); }}
+          >
+            Start over
+          </button>
+        </p>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur" aria-live="polite">

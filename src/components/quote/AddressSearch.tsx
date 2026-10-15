@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { newSessionToken, resolveSuggestion, searchSuggestions, type Place, type Suggestion } from "../../lib/geo";
+import { locateMe, newSessionToken, resolveSuggestion, searchSuggestions, type Place, type Suggestion } from "../../lib/geo";
 import { inputClass } from "../ui";
 
 interface Props {
@@ -23,9 +23,35 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
   const [failed, setFailed] = useState(false);
   const [searched, setSearched] = useState(false);
   const [resolveFailed, setResolveFailed] = useState(false);
+  const [canLocate, setCanLocate] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locateMsg, setLocateMsg] = useState("");
   const token = useRef<string>("");
   const timer = useRef<number | undefined>(undefined);
   const ctrl = useRef<AbortController | null>(null);
+
+  useEffect(() => setCanLocate(typeof navigator !== "undefined" && "geolocation" in navigator), []);
+
+  async function useMyLocation() {
+    setLocating(true);
+    setLocateMsg("");
+    setOpen(false);
+    const r = await locateMe();
+    setLocating(false);
+    if (r.ok) {
+      onText(r.place.label);
+      onPlace(r.place);
+      setResolveFailed(false);
+      return;
+    }
+    setLocateMsg(
+      r.reason === "denied"
+        ? "Location is switched off for this site. Type the address instead, or allow location in your browser settings."
+        : r.reason === "outside"
+          ? "Your location is outside Johannesburg, and we only move within Johannesburg. Type the address instead."
+          : "We could not get your location. Type the address instead.",
+    );
+  }
 
   useEffect(
     () => () => {
@@ -158,6 +184,21 @@ export function AddressSearch({ id, label, value, place, placeholder, error, onT
           )}
         </span>
       </div>
+
+      {canLocate && (
+        <button
+          type="button"
+          onClick={useMyLocation}
+          disabled={locating}
+          className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-lg px-1 text-sm font-semibold text-brand-600 underline disabled:opacity-60"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /><circle cx="12" cy="12" r="8" />
+          </svg>
+          {locating ? "Finding your location…" : "Use my current location"}
+        </button>
+      )}
+      {locateMsg && <p role="alert" className="mt-1 text-sm font-medium text-red-700">{locateMsg}</p>}
 
       {showPanel && (
         <ul

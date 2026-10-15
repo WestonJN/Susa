@@ -44,8 +44,8 @@ total     = subtotal (+ VAT only if VAT_REGISTERED)
 ```
 
 Vehicles: bakkie deck 2.785 x 1.63 m (published specification, 1 335 kg payload, 1 250 kg braked towing limit)
-with an ASSUMED 0.8 m stacking height = 3.6 m3 (base R450, R9/km, floor R600); closed trailer ASSUMED 2.4 x 1.3 x 1.2 m
-= 3.7 m3, so 7.3 m3 in total (base R550, R10/km, floor R750). Measure the stacking height and trailer.
+with a working 0.8 m stacking height = 3.6 m3 (base R450, R9/km, floor R600); closed trailer working size 2.4 x 1.3 x 1.2 m
+= 3.7 m3, so 7.3 m3 in total (base R550, R10/km, floor R750).
 
 Load assistant: adds the m3 of the chosen items, then picks the smallest vehicle where
 `capacity x 0.85 >= volume`; otherwise the combo with `trips = ceil(volume / (capacity x 0.85))`.

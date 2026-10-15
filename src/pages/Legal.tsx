@@ -58,6 +58,7 @@ export function Privacy() {
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li><strong>GitHub Pages</strong> hosts this website (United States). It receives your IP address when you load a page, as any host does.</li>
           <li><strong>Address search:</strong> the text you type in an address box goes to Photon, an OpenStreetMap-based service (Germany), or to Google Places (United States) if we have enabled it.</li>
+          <li><strong>Your location:</strong> only if you tap "Use my current location". Your browser asks your permission first, and the coordinates are sent to Photon to find the street address. We do not store them unless you send your request.</li>
           <li><strong>OSRM</strong> (routing) receives the coordinates of the two addresses you pick to work out the driving distance.</li>
           <li><strong>WhatsApp or email:</strong> if you send your request that way, it goes through your own WhatsApp or email app, under their terms.</li>
         </ul>

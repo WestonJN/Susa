@@ -216,3 +216,44 @@ export async function routeDistanceKm(a: Place, b: Place): Promise<RouteResult> 
   }
   return { km: quickDistanceKm(a, b), estimated: true };
 }
+
+
+export type LocateResult = { ok: true; place: Place } | { ok: false; reason: "unsupported" | "denied" | "unavailable" | "outside" };
+
+/** Ask the browser for the device position (the browser shows its own permission prompt). */
+function devicePosition(): Promise<{ lat: number; lon: number }> {
+  return new Promise((resolve, reject) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return reject(Object.assign(new Error("unsupported"), { code: 0 }));
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+      (e) => reject(e),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    );
+  });
+}
+
+/** Turn coordinates into a street address with Photon's reverse lookup (works whichever search provider is on). */
+export async function reverseGeocode(lat: number, lon: number, signal?: AbortSignal): Promise<string | null> {
+  try {
+    const res = await fetch(`https://photon.komoot.io/reverse?lon=${lon}&lat=${lat}&lang=en&limit=1`, { signal });
+    if (!res.ok) return null;
+    const first = parsePhoton(await res.json())[0];
+    return first?.label ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** "Use my current location": position, then address. Johannesburg only. */
+export async function locateMe(signal?: AbortSignal): Promise<LocateResult> {
+  let pos: { lat: number; lon: number };
+  try {
+    pos = await devicePosition();
+  } catch (e) {
+    const code = (e as { code?: number }).code;
+    return { ok: false, reason: code === 0 ? "unsupported" : code === 1 ? "denied" : "unavailable" };
+  }
+  if (!inJohannesburg(pos.lat, pos.lon)) return { ok: false, reason: "outside" };
+  const label = (await reverseGeocode(pos.lat, pos.lon, signal)) ?? "My current location";
+  return { ok: true, place: { label, lat: pos.lat, lon: pos.lon } };
+}

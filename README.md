@@ -65,7 +65,7 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 ## What is a placeholder
 
 - **All rates** in `src/lib/catalog.ts` (fleet fees, per-km, crew, floors, packing, floors/ceilings). Set them before launch.
-- **Bakkie and trailer size** (`BAKKIE_DECK`, `TRAILER_BOX` in `src/lib/catalog.ts`): deck length and width are the published specification; the stacking height and the trailer box are assumptions. Measure and update; capacities follow automatically.
+- **Bakkie and trailer size** (`BAKKIE_DECK`, `TRAILER_BOX` in `src/lib/catalog.ts`): deck length and width are the published specification; the 0.8 m stacking height and the trailer box are working figures. Change them and capacities follow automatically.
 - **Bookable days** (`bookingDays` in `src/config/site.ts`): only Sundays for the MVP. Add weekday numbers (0 = Sunday) to open more days.
 - **Contact details** have built-in defaults in `src/config/site.ts`; repository variables override them.
 - **Address search** uses free Photon (OpenStreetMap) and OSRM, limited to Johannesburg, unless `GOOGLE_MAPS_API_KEY` is set (then Google Places). The Google path is only tested against mocks.

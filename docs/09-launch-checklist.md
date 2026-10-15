@@ -15,9 +15,12 @@
 - [x] "Hyundai H100" removed from all site wording (vehicles are "1.3 ton bakkie")
 - [x] Donations, unwanted items and small office moves confirmed in scope
 
+- [x] Vehicle pictures from the supplied image; stacking height settled at 0.8 m (not to be measured)
+- [x] "Use my current location" on both address boxes (browser location, Photon reverse lookup; Google Places has no such feature)
+- [x] After sending: edit the quote, cancel and start again, leave without sending; review-step edit links; Start over button
+
 ## Left to do (simplest first)
-- [ ] Real photos of your own bakkie and trailer in `src/assets/fleet/` (bakkie.jpg, bakkie-trailer.jpg). Mockup images were removed; drawn illustrations show until then.
-- [ ] Measure the stacking height on the deck and the trailer box (`catalog.ts`)
+- [ ] Optional: replace the vehicle pictures (cropped from your supplied image) with real photos of your own bakkie and trailer in `src/assets/fleet/` (bakkie.jpg, bakkie-trailer.jpg)
 - [ ] Set real rates in `catalog.ts` (all are placeholders)
 - [ ] Decide how customers pay the deposit (EFT details), and write it into your confirmation message
 - [ ] Register the business (CIPC), then set LEGAL_NAME, REG_NUMBER, BUSINESS_ADDRESS (VAT_NUMBER if registered)
