@@ -96,11 +96,8 @@ Results (12 jobs a month): T1 R1,300 (21% margin), T2 R2,040 (24%), T3 R2,490 (2
 4. **Price the trailer jobs well.** They carry the profit.
 5. **Raise the callout** for bakkie-only jobs, which barely cover their cost.
 
-## 8. Website changes this implies (not done yet)
+## 8. Website changes (implemented, pricing engine v2)
 
-- Replace base fee, per-km and crew-rate placeholders with the card above, and add the vehicle-and-driver hourly charge and the 3 and 4-hour minimums.
-- Replace the engine's time estimate (volume times 0.3 hours) with the load, stairs and travel estimate used here. It currently gives about 2 hours for a 1-bedroom move; the model uses about 4.5.
-- Add `fuelPricePerLitre` to the catalogue so the per-km rate follows diesel each month.
-- Add a weight check for the trailer's 1,250 kg limit.
+Done: callout R900, vehicle-and-driver R100/h, crew R80 per mover-hour, 3 h and 4 h minimums, the new time estimate, per-km rates derived from `rates.dieselPricePerLitre`, a weight check (1,335 kg bakkie, about 2,085 kg with trailer; `loadKg` flags the quote for review and adds trips in the load assistant), minimum charge R1,200.
 
-Say the word and I will implement these once you have confirmed or replaced the assumptions (insurance, trailer price, loan rate, wages).
+Still assumptions to replace with real quotes: insurance, trailer price and weight, loan rate, wages, Sunday pay. Update `catalog.ts` `rates` and the vehicle `maxLoadKg` when known.

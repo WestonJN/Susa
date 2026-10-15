@@ -21,7 +21,7 @@
 
 ## Left to do (simplest first)
 - [ ] Optional: replace the vehicle pictures (cropped from your supplied image) with real photos of your own bakkie and trailer in `src/assets/fleet/` (bakkie.jpg, bakkie-trailer.jpg)
-- [ ] Set real rates in `catalog.ts` (all are placeholders)
+- [ ] Confirm rates in `catalog.ts` with real quotes (rate card v2 is in; insurance, trailer, loan and diesel price are assumptions; update `dieselPricePerLitre` monthly)
 - [ ] Decide how customers pay the deposit (EFT details), and write it into your confirmation message
 - [ ] Register the business (CIPC), then set LEGAL_NAME, REG_NUMBER, BUSINESS_ADDRESS (VAT_NUMBER if registered)
 - [ ] Buy a domain, set CUSTOM_DOMAIN, point DNS (this also lifts noindex staging mode)

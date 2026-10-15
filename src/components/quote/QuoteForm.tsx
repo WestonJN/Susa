@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { site } from "../../config/site";
-import { getTier, getVehicle, rates, tiers, totalVolume, vehicles, type TierId } from "../../lib/catalog";
+import { getTier, getVehicle, rates, tiers, totalVolume, totalWeightKg, vehicles, type TierId } from "../../lib/catalog";
 import { calculateQuote, formatZar } from "../../lib/pricing";
 import { newIdempotencyKey, submitQuoteRequest, type QuoteRequestV1 } from "../../lib/api";
 import { clean, isBookableDay, isEmail, normaliseZaPhone, todayIso } from "../../lib/validation";
@@ -137,6 +137,7 @@ export function QuoteForm() {
   }, [s.pickupPlace, s.dropoffPlace]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const volume = totalVolume(s.items) || null;
+  const loadKg = totalWeightKg(s.items) || null;
   const quote = useMemo(
     () =>
       calculateQuote({
@@ -148,10 +149,11 @@ export function QuoteForm() {
         floors: s.floors,
         trips: s.trips,
         volumeM3: volume,
+        loadKg,
         vatRegistered: site.vatRegistered,
         vatRate: site.vatRate,
       }),
-    [s.vehicleId, s.tier, s.distanceKm, s.tollEstimate, helpers, s.floors, s.trips, volume],
+    [s.vehicleId, s.tier, s.distanceKm, s.tollEstimate, helpers, s.floors, s.trips, volume, loadKg],
   );
 
   function next() {

@@ -9,7 +9,7 @@ describe that backend; they are designs, not running software.
 | Piece | Status | Notes |
 | --- | --- | --- |
 | Website (prerendered pages, SEO, hosting on GitHub Pages) | Built, live | `https://westonjn.github.io/Susa/` |
-| Quote form and price calculator (`src/lib/pricing.ts`) | Built, tested, runs in the browser | Rates are placeholders. |
+| Quote form and price calculator (`src/lib/pricing.ts`) | Built, tested, runs in the browser | Rate card from the pricing research (v2); insurance, trailer and loan figures still assumed. |
 | Address search and distance | Built, runs in the browser | Photon (free) or Google Places if a key is set; OSRM for road distance. |
 | Quote submission contract (`POST /v1/quote-requests`) | Typed and documented only | Nothing receives it. |
 | Email or WhatsApp to the customer | **Not built** | The site never sends anything to the customer. |
@@ -32,20 +32,26 @@ Until the backend exists, set `WHATSAPP_NUMBER` and `CONTACT_EMAIL`, otherwise r
 ## The calculations (all in `src/lib/pricing.ts`, rates in `src/lib/catalog.ts`)
 
 ```
-transport = (baseFee + perKm x km) x trips          // km rounded to whole km
-crew      = (tier crew + helpers, max 2, driver not counted) x hours x R120 x trips
+callout   = R900 (once per booking)
+distance  = perKm x km x trips   // perKm = round(running cost per km x 1.6 x 1.2): R10 bakkie, R12 with trailer
+                                 // running cost follows rates.dieselPricePerLitre (R33.50 now)
+vehicle   = R100 x billable hours (vehicle and driver)
+crew      = (tier crew + helpers, max 2, driver not counted) x billable hours x R80
+hours     = max(2, ceil((0.5 + 0.4 x m3 + 0.25 x floors + trips x driven km / 30) x 2) / 2)
+driven km = 1.6 x move km + 8   (m3 = 3 if unknown)
+billable  = max(hours, 3 without crew, 4 with crew)
+stairs    = R90 x floors (crew tiers)
+packing   = R85 x volume m3 (full-service tier only)
+subtotal  = max(minCharge R1,200, all lines + tolls), rounded to nearest R10
 deposit   = 50% of total, nearest R10
-hours     = max(2, round((baseHours + floors x 0.25 + km / 80) x 2) / 2)
-baseHours = volume m3 x 0.3   (2 if volume unknown)
-stairs    = R90 x floors
-packing   = R85 x volume m3   (full-service tier only)
-subtotal  = max(minCharge, transport + crew + stairs + packing + tolls), rounded to nearest R10
 total     = subtotal (+ VAT only if VAT_REGISTERED)
+weight    = m3 x 150 kg + 60 kg per heavy item; over the vehicle limit (1 335 kg bakkie, about 2 085 kg with trailer) flags for review
 ```
 
+
 Vehicles: bakkie deck 2.785 x 1.63 m (published specification, 1 335 kg payload, 1 250 kg braked towing limit)
-with a working 0.8 m stacking height = 3.6 m3 (base R450, R9/km, floor R600); closed trailer working size 2.4 x 1.3 x 1.2 m
-= 3.7 m3, so 7.3 m3 in total (base R550, R10/km, floor R750).
+with a working 0.8 m stacking height = 3.6 m3 (callout R900, R100/h); closed trailer working size 2.4 x 1.3 x 1.2 m
+= 3.7 m3, so 7.3 m3 in total (callout R900, R100/h, assumed 500 kg trailer weight).
 
 Load assistant: adds the m3 of the chosen items, then picks the smallest vehicle where
 `capacity x 0.85 >= volume`; otherwise the combo with `trips = ceil(volume / (capacity x 0.85))`.

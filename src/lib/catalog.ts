@@ -17,8 +17,14 @@ export interface Vehicle {
   spec: string;
   /** Usable cargo volume in m³ (before packing-efficiency allowance). */
   capacityM3: number;
+  /** Callout fee, charged once per booking. */
   baseFee: number;
+  /** Vehicle and driver time, per billable hour. */
+  hourly: number;
+  /** Charge per kilometre of the move, derived from fuel price and running costs (see runningCostPerKm). */
   perKm: number;
+  /** Heaviest load we plan for, in kg (payload, or combined bakkie and trailer load). */
+  maxLoadKg: number;
   /** Hard price floor: no automatic quote goes below this. */
   minCharge: number;
   /** Hard ceiling: automatic quotes above this go to a human. */
@@ -38,6 +44,47 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 export const H100_M3 = round1(BAKKIE_DECK.lengthM * BAKKIE_DECK.widthM * BAKKIE_DECK.loadHeightM);
 export const TRAILER_M3 = round1(TRAILER_BOX.lengthM * TRAILER_BOX.widthM * TRAILER_BOX.heightM);
 
+export const rates = {
+  /** Per mover, per hour (the driver is covered by the vehicle hourly rate). */
+  crewHourly: 80,
+  stairFeePerFloor: 90,
+  packingPerM3: 85,
+  /** Share of a vehicle's capacity we treat as realistically loadable. */
+  loadEfficiency: 0.85,
+  /** Confidence below this routes the quote to a human. */
+  autoApproveConfidence: 0.8,
+  /** More trips than this and a person confirms the plan (big moves with a small van). */
+  maxAutoTrips: 3,
+  /** Beyond this road distance the route is treated as outside Johannesburg and priced by a person. */
+  longDistanceKm: 60,
+  maxFloors: 4,
+  /** Most movers we send on one job, not counting the driver. */
+  maxCrew: 2,
+  /** Share of the total paid as a deposit to confirm a booking. */
+  depositShare: 0.5,
+  /** Diesel pump price per litre in Johannesburg. Update when the fuel price changes; per-km rates follow. */
+  dieselPricePerLitre: 33.5,
+  /** The truck also drives to the pickup and home again: driven km = positioningFactor x move km + positioningBase. */
+  positioningFactor: 1.6,
+  positioningBase: 8,
+  /** Safety margin on the per-km charge over the running cost. */
+  perKmMargin: 1.2,
+  avgSpeedKmh: 30,
+  /** Shortest billed job. Crew jobs are billed longer because movers are paid a minimum shift. */
+  minHoursNoCrew: 3,
+  minHoursCrew: 4,
+  /** Furniture is roughly this heavy per m³, plus an allowance per heavy item (appliances, safes, big wardrobes). */
+  kgPerM3: 150,
+  heavyItemKg: 60,
+} as const;
+
+/** Fuel plus maintenance per driven km. Litres per 100 km and maintenance per km are working assumptions. */
+export const runningCostPerKm = (litresPer100: number, maintenancePerKm: number) =>
+  (litresPer100 / 100) * rates.dieselPricePerLitre + maintenancePerKm;
+/** Rand per move km: running cost of the extra driving, with a margin, to the nearest rand. */
+const perKmCharge = (litresPer100: number, maintenancePerKm: number) =>
+  Math.round(runningCostPerKm(litresPer100, maintenancePerKm) * rates.positioningFactor * rates.perKmMargin);
+
 export const vehicles: readonly Vehicle[] = [
   {
     id: "h100",
@@ -46,9 +93,11 @@ export const vehicles: readonly Vehicle[] = [
     bestFor: "A few items, a student room or large appliances. The open dropside makes tall and awkward items easy to load.",
     spec: `Open dropside deck, about ${BAKKIE_DECK.lengthM.toFixed(1)} m x ${BAKKIE_DECK.widthM.toFixed(1)} m, around ${H100_M3} m³ of load space`,
     capacityM3: H100_M3,
-    baseFee: 450,
-    perKm: 9,
-    minCharge: 600,
+    baseFee: 900,
+    hourly: 100,
+    perKm: perKmCharge(11.5, 1.3),
+    maxLoadKg: 1335,
+    minCharge: 1200,
     maxAutoQuote: 3500,
   },
   {
@@ -58,9 +107,13 @@ export const vehicles: readonly Vehicle[] = [
     bestFor: "One-bedroom homes and bulky furniture. The closed trailer is specifically designed for furniture transport and protects your things from the weather.",
     spec: `Bakkie and closed trailer, about ${(H100_M3 + TRAILER_M3).toFixed(1)} m³ in total`,
     capacityM3: H100_M3 + TRAILER_M3,
-    baseFee: 550,
-    perKm: 10,
-    minCharge: 750,
+    baseFee: 900,
+    hourly: 100,
+    perKm: perKmCharge(13.5, 1.6),
+    // Bakkie payload 1 335 kg; combined load is limited by the 4 250 kg train weight
+    // (less the bakkie's own weight and an assumed 500 kg trailer): about 2 085 kg. Confirm on the real trailer.
+    maxLoadKg: 2085,
+    minCharge: 1200,
     maxAutoQuote: 4000,
   },
 ] as const;
@@ -106,24 +159,6 @@ export function getTier(id: string): Tier {
   return tiers.find((t) => t.id === id) ?? tiers[0]!;
 }
 
-export const rates = {
-  crewHourly: 120,
-  stairFeePerFloor: 90,
-  packingPerM3: 85,
-  /** Share of a vehicle's capacity we treat as realistically loadable. */
-  loadEfficiency: 0.85,
-  /** Confidence below this routes the quote to a human. */
-  autoApproveConfidence: 0.8,
-  /** More trips than this and a person confirms the plan (big moves with a small van). */
-  maxAutoTrips: 3,
-  /** Beyond this road distance the route is treated as outside Johannesburg and priced by a person. */
-  longDistanceKm: 60,
-  maxFloors: 4,
-  /** Most movers we send on one job, not counting the driver. */
-  maxCrew: 2,
-  /** Share of the total paid as a deposit to confirm a booking. */
-  depositShare: 0.5,
-} as const;
 
 export interface CatalogItem {
   id: string;
@@ -251,7 +286,12 @@ export interface LoadRecommendation {
   vehicleId: VehicleId | null;
   trips: number;
   helpers: number;
+  /** Estimated weight of the load in kg. */
+  loadKg: number;
 }
+
+export const estimateLoadKg = (volumeM3: number, heavyItems: number) =>
+  Math.round(volumeM3 * rates.kgPerM3 + heavyItems * rates.heavyItemKg);
 
 /** Smallest truck that realistically fits the load; multiple trips if even the biggest can't. */
 export function recommendLoad(items: Record<string, number>): LoadRecommendation {
@@ -264,21 +304,28 @@ export function recommendLoad(items: Record<string, number>): LoadRecommendation
     if (it.heavy) heavy += qty;
   }
   volume = Math.round(volume * 100) / 100;
-  if (volume === 0) return { volumeM3: 0, vehicleId: null, trips: 1, helpers: 0 };
+  if (volume === 0) return { volumeM3: 0, vehicleId: null, trips: 1, helpers: 0, loadKg: 0 };
 
-  const fit = vehicles.find((v) => v.capacityM3 * rates.loadEfficiency >= volume);
+  const loadKg = estimateLoadKg(volume, heavy);
+  const fit = vehicles.find((v) => v.capacityM3 * rates.loadEfficiency >= volume && v.maxLoadKg >= loadKg);
   const biggest = vehicles[vehicles.length - 1]!;
   const vehicle = fit ?? biggest;
-  const trips = fit ? 1 : Math.ceil(volume / (biggest.capacityM3 * rates.loadEfficiency));
+  const trips = fit
+    ? 1
+    : Math.max(Math.ceil(volume / (biggest.capacityM3 * rates.loadEfficiency)), Math.ceil(loadKg / biggest.maxLoadKg));
 
   let helpers = 0;
   if (volume > 3 || heavy > 0) helpers = 1;
   if (volume > 8 || heavy >= 3) helpers = 2;
   helpers = Math.min(helpers, rates.maxCrew);
 
-  return { volumeM3: volume, vehicleId: vehicle.id, trips, helpers };
+  return { volumeM3: volume, vehicleId: vehicle.id, trips, helpers, loadKg };
 }
 
 export function totalVolume(items: Record<string, number>): number {
   return recommendLoad(items).volumeM3;
+}
+
+export function totalWeightKg(items: Record<string, number>): number {
+  return recommendLoad(items).loadKg;
 }

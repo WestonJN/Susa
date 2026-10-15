@@ -64,7 +64,7 @@ Optional repository Variables (Settings > Secrets and variables > Actions > Vari
 
 ## What is a placeholder
 
-- **All rates** in `src/lib/catalog.ts` (fleet fees, per-km, crew, floors, packing, floors/ceilings). Set them before launch.
+- **All rates** in `src/lib/catalog.ts` (callout, hourly, per-km from the diesel price, crew, floors, packing, weight limits, floors/ceilings). Rate card v2 is in; confirm against real quotes before launch.
 - **Bakkie and trailer size** (`BAKKIE_DECK`, `TRAILER_BOX` in `src/lib/catalog.ts`): deck length and width are the published specification; the 0.8 m stacking height and the trailer box are working figures. Change them and capacities follow automatically.
 - **Bookable days** (`bookingDays` in `src/config/site.ts`): only Sundays for the MVP. Add weekday numbers (0 = Sunday) to open more days.
 - **Contact details** have built-in defaults in `src/config/site.ts`; repository variables override them.

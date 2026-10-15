@@ -10,6 +10,8 @@ export interface QuoteInput {
   trips: number;
   /** m³ from the load assistant, or null if the customer skipped it. */
   volumeM3: number | null;
+  /** Estimated weight in kg from the load assistant, or null if unknown. */
+  loadKg?: number | null;
   vatRegistered: boolean;
   vatRate: number;
 }
@@ -60,21 +62,28 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
   let confidence = 1;
   const lines: QuoteLine[] = [];
 
-  const transport = (vehicle.baseFee + vehicle.perKm * km) * trips;
+  const crew = tier.crew + helpers;
+
+  // Time: loading, unloading, stairs and the drive (the truck also travels to the pickup and home again).
+  const drivenKm = rates.positioningFactor * km + rates.positioningBase;
+  const rawHours =
+    0.5 + 0.4 * (input.volumeM3 ?? 3) + 0.25 * floors + (trips * drivenKm) / rates.avgSpeedKmh;
+  const estHours = Math.max(2, Math.ceil(rawHours * 2) / 2);
+  const hours = Math.max(estHours, crew > 0 ? rates.minHoursCrew : rates.minHoursNoCrew);
+
+  lines.push({ label: `${vehicle.name}: callout`, amount: vehicle.baseFee });
   lines.push({
-    label: `${vehicle.name}, ${Math.round(km)} km${trips > 1 ? ` x ${trips} trips` : ""}`,
-    amount: transport,
+    label: `Distance: ${Math.round(km)} km${trips > 1 ? ` x ${trips} trips` : ""}`,
+    amount: vehicle.perKm * km * trips,
   });
+  lines.push({ label: `Vehicle and driver: ${hours} h (estimate)`, amount: vehicle.hourly * hours });
 
   if (input.tollEstimate > 0) lines.push({ label: "Tolls (your figure)", amount: input.tollEstimate });
 
-  const crew = tier.crew + helpers;
   if (crew > 0) {
-    const baseHours = input.volumeM3 != null ? input.volumeM3 * 0.3 : 2;
-    const hours = Math.max(2, Math.round((baseHours + floors * 0.25 + km / 80) * 2) / 2);
     lines.push({
       label: `Crew: ${crew} ${crew > 1 ? "people" : "person"} x ${hours} h (estimate)`,
-      amount: crew * hours * rates.crewHourly * trips,
+      amount: crew * hours * rates.crewHourly,
     });
     if (floors > 0) lines.push({ label: `Stairs: ${floors} floor${floors > 1 ? "s" : ""}`, amount: floors * rates.stairFeePerFloor });
   }
@@ -98,6 +107,10 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
   if (input.volumeM3 != null && input.volumeM3 > vehicle.capacityM3 * rates.loadEfficiency * trips) {
     confidence -= 0.4;
     reasons.push("Your items may not fit the chosen vehicle and number of trips.");
+  }
+  if (input.loadKg != null && input.loadKg > vehicle.maxLoadKg * trips) {
+    confidence -= 0.4;
+    reasons.push("Your items may be too heavy for the chosen vehicle and number of trips.");
   }
   if (trips > rates.maxAutoTrips) {
     confidence -= 0.3;

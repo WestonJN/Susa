@@ -1,7 +1,7 @@
 import { isBookableDay, weekdayOf } from "./validation";
 import { describe, expect, it } from "vitest";
 import { calculateQuote, type QuoteInput } from "./pricing";
-import { recommendLoad, vehicles } from "./catalog";
+import { getVehicle, recommendLoad, vehicles } from "./catalog";
 
 const base: QuoteInput = {
   vehicleId: "h100_trailer",
@@ -23,22 +23,40 @@ describe("calculateQuote", () => {
     expect(calculateQuote({ ...base, distanceKm: 0 }).status).toBe("incomplete");
   });
 
-  it("builds a ready quote from base fee + distance", () => {
+  it("builds a ready quote from callout + distance + time", () => {
     const q = calculateQuote(base);
     expect(q.status).toBe("ready");
-    expect(q.total).toBe(750); // 550 + 10*20
+    expect(q.total).toBe(1490); // callout 900 + 12*20 km + 3.5 h x 100
+    expect(q.lines.map((l) => l.amount)).toEqual([900, 240, 350]);
     expect(q.reasons).toEqual([]);
   });
 
   it("never goes below the hard price floor", () => {
     const q = calculateQuote({ ...base, vehicleId: "h100", distanceKm: 1 });
-    expect(q.subtotal).toBe(600);
+    expect(q.subtotal).toBeGreaterThanOrEqual(1200);
+    expect(q.lines.find((l) => l.label.startsWith("Vehicle and driver"))?.amount).toBe(300); // 3 h minimum
   });
 
-  it("multiplies transport by trips", () => {
-    const one = calculateQuote(base).subtotal;
-    const two = calculateQuote({ ...base, trips: 2 }).subtotal;
-    expect(two).toBe(one * 2);
+  it("charges the callout once and distance and drive time per trip", () => {
+    const one = calculateQuote(base);
+    const two = calculateQuote({ ...base, trips: 2 });
+    expect(two.lines[0]?.amount).toBe(900);
+    expect(two.lines[1]?.amount).toBe(480);
+    expect(two.subtotal).toBe(1830);
+    expect(two.subtotal).toBeGreaterThan(one.subtotal);
+  });
+
+  it("flags loads that are too heavy for the vehicle", () => {
+    const light = calculateQuote({ ...base, vehicleId: "h100", volumeM3: 2, loadKg: 900 });
+    const heavy = calculateQuote({ ...base, vehicleId: "h100", volumeM3: 2, loadKg: 1500 });
+    expect(light.status).toBe("ready");
+    expect(heavy.status).toBe("needs_review");
+    expect(heavy.reasons.join(" ")).toMatch(/heavy/);
+  });
+
+  it("derives per-km rates from the diesel price", () => {
+    expect(getVehicle("h100")?.perKm).toBe(10);
+    expect(getVehicle("h100_trailer")?.perKm).toBe(12);
   });
 
   it("routes quotes above the automatic ceiling to a human", () => {
@@ -75,6 +93,12 @@ describe("calculateQuote", () => {
 });
 
 describe("recommendLoad", () => {
+  it("adds trips when a dense load exceeds the weight limit", () => {
+    const r = recommendLoad({ "fridge-double": 6, "freezer-chest": 4, safe: 4 });
+    expect(r.loadKg).toBeGreaterThan(2085 * 0.9);
+    expect(r.trips).toBeGreaterThanOrEqual(1);
+  });
+
   it("returns no vehicle for an empty inventory", () => {
     expect(recommendLoad({}).vehicleId).toBeNull();
   });
