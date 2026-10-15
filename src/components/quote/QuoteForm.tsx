@@ -270,8 +270,34 @@ export function QuoteForm() {
 
   const v = getVehicle(s.vehicleId);
 
+  const lineItems = (
+    <ul className="space-y-1 rounded-xl bg-slate-50 p-3 text-left text-sm">
+      {quote.lines.map((l) => (
+        <li key={l.label} className="flex justify-between gap-3"><span>{l.label}</span><span className="tabular-nums">{formatZar(l.amount)}</span></li>
+      ))}
+      {site.vatRegistered && <li className="flex justify-between gap-3"><span>VAT</span><span className="tabular-nums">{formatZar(quote.vat)}</span></li>}
+    </ul>
+  );
+  const notes = (
+    <>
+      {quote.status === "needs_review" && (
+        <p className="mt-2 text-left text-sm text-amber-700">Our team will check this price before confirming it. {quote.reasons[0]}</p>
+      )}
+      <p className="mt-2 text-left text-xs text-slate-500">This is an estimate. It excludes packing and dismantling unless you chose Full service. Our team confirms the final price.</p>
+    </>
+  );
+  const figures = (
+    <div>
+      <div className="text-xs uppercase tracking-wide text-slate-500">Estimate{site.vatRegistered ? " incl. VAT" : ""}</div>
+      <div className="text-2xl font-extrabold text-brand-900">{formatZar(quote.total)}</div>
+      <div className="text-xs text-slate-600">50% deposit to confirm: {formatZar(quote.deposit)}</div>
+    </div>
+  );
+
   return (
-    <div className="pb-28">
+    <div className="pb-28 lg:pb-0">
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
+      <div className="min-w-0">
       <nav aria-label="Quote progress" className="mb-6">
         <ol className="flex items-start">
           {STEPS.map((label, i) => {
@@ -499,30 +525,34 @@ export function QuoteForm() {
           </button>
         </p>
       </div>
+      </div>
+        <aside className="hidden lg:sticky lg:top-24 lg:block" aria-label="Your estimate" aria-live="polite">
+          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            {quote.status === "incomplete" ? (
+              <p className="text-sm text-slate-600">Add your route and vehicle to see your estimate.</p>
+            ) : (
+              <>
+                {figures}
+                <h2 className="mb-2 mt-4 text-sm font-semibold text-brand-900">How it adds up</h2>
+                {lineItems}
+                {notes}
+              </>
+            )}
+          </div>
+        </aside>
+      </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur" aria-live="polite">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur lg:hidden" aria-live="polite">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           {quote.status === "incomplete" ? (
             <p className="text-sm text-slate-600">Add your route and vehicle to see your estimate.</p>
           ) : (
             <>
-              <div>
-                <div className="text-xs uppercase tracking-wide text-slate-500">Estimate{site.vatRegistered ? " incl. VAT" : ""}</div>
-                <div className="text-2xl font-extrabold text-brand-900">{formatZar(quote.total)}</div>
-                <div className="text-xs text-slate-600">50% deposit to confirm: {formatZar(quote.deposit)}</div>
-              </div>
+              {figures}
               <details className="max-w-[60%] text-right text-sm">
                 <summary className="cursor-pointer font-semibold text-brand-600">How it adds up</summary>
-                <ul className="mt-2 space-y-1 rounded-xl bg-slate-50 p-3 text-left">
-                  {quote.lines.map((l) => (
-                    <li key={l.label} className="flex justify-between gap-3"><span>{l.label}</span><span className="tabular-nums">{formatZar(l.amount)}</span></li>
-                  ))}
-                  {site.vatRegistered && <li className="flex justify-between gap-3"><span>VAT</span><span className="tabular-nums">{formatZar(quote.vat)}</span></li>}
-                </ul>
-                {quote.status === "needs_review" && (
-                  <p className="mt-2 text-left text-amber-700">Our team will check this price before confirming it. {quote.reasons[0]}</p>
-                )}
-                <p className="mt-2 text-left text-xs text-slate-500">This is an estimate. It excludes packing and dismantling unless you chose Full service. Our team confirms the final price.</p>
+                <div className="mt-2">{lineItems}</div>
+                {notes}
               </details>
             </>
           )}
