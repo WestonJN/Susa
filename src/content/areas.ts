@@ -20,7 +20,7 @@ export const areas: readonly Area[] = [
       "Load-shedding can stop lifts and gate motors. Check the schedule for your move day and ask whether the building's lift has backup power.",
       "Kerb space is limited in busy areas such as the CBD, Rosebank and Sandton. Ask the building where a vehicle may stop to load.",
       "The N1, M1 and other main routes are busiest on weekday mornings and late afternoons. An early start or a weekend slot usually makes for an easier day.",
-      "We move with one Hyundai H100 bakkie, on its own or with a closed trailer. A bakkie is easier to get into tight complexes and narrow streets than a large truck. If you are worried about a low gate or a steep driveway, say so when you send your request.",
+      "We move with one 1.3 ton bakkie, on its own or with a closed trailer. A bakkie is easier to get into tight complexes and narrow streets than a large truck. If you are worried about a low gate or a steep driveway, say so when you send your request.",
       "Without a lift, every floor the crew carries adds time. Enter the number of floors in the quote form and it shows as a line in your estimate.",
     ],
     nearby: [

@@ -1,3 +1,4 @@
+import { isBookableDay, weekdayOf } from "./validation";
 import { describe, expect, it } from "vitest";
 import { calculateQuote, type QuoteInput } from "./pricing";
 import { recommendLoad, vehicles } from "./catalog";
@@ -78,10 +79,10 @@ describe("recommendLoad", () => {
     expect(recommendLoad({}).vehicleId).toBeNull();
   });
 
-  it("sizes the two classes from the H100 bakkie and trailer", () => {
+  it("sizes the two classes from the 1.3 ton bakkie and trailer", () => {
     const bk = vehicles.find((v) => v.id === "h100")!;
     const combo = vehicles.find((v) => v.id === "h100_trailer")!;
-    expect(bk.capacityM3).toBe(2.9);
+    expect(bk.capacityM3).toBe(3.6);
     expect(combo.capacityM3).toBeGreaterThan(bk.capacityM3);
     expect(vehicles).toHaveLength(2);
   });
@@ -98,5 +99,20 @@ describe("recommendLoad", () => {
     const r = recommendLoad({ "sofa-l": 30 });
     expect(r.vehicleId).toBe(vehicles[vehicles.length - 1]!.id);
     expect(r.trips).toBeGreaterThan(1);
+  });
+});
+
+describe("crew, deposit and booking days", () => {
+  it("never sends more than two movers, and the deposit is half the total", () => {
+    const q = calculateQuote({ ...base, tier: "full", helpers: 5, volumeM3: 3 });
+    const crewLine = q.lines.find((l) => l.label.startsWith("Crew"))!;
+    expect(crewLine.label).toContain("2 people");
+    expect(q.deposit).toBe(Math.round((q.total * 0.5) / 10) * 10);
+  });
+  it("only accepts future Sundays", () => {
+    expect(weekdayOf("2026-10-18")).toBe(0);
+    expect(isBookableDay("2026-10-18", "2026-10-15", [0])).toBe(true);
+    expect(isBookableDay("2026-10-19", "2026-10-15", [0])).toBe(false);
+    expect(isBookableDay("2026-10-11", "2026-10-15", [0])).toBe(false);
   });
 });

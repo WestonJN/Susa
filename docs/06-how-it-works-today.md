@@ -33,7 +33,8 @@ Until the backend exists, set `WHATSAPP_NUMBER` and `CONTACT_EMAIL`, otherwise r
 
 ```
 transport = (baseFee + perKm x km) x trips          // km rounded to whole km
-crew      = (tier crew + helpers) x hours x R120 x trips
+crew      = (tier crew + helpers, max 2, driver not counted) x hours x R120 x trips
+deposit   = 50% of total, nearest R10
 hours     = max(2, round((baseHours + floors x 0.25 + km / 80) x 2) / 2)
 baseHours = volume m3 x 0.3   (2 if volume unknown)
 stairs    = R90 x floors
@@ -42,9 +43,9 @@ subtotal  = max(minCharge, transport + crew + stairs + packing + tolls), rounded
 total     = subtotal (+ VAT only if VAT_REGISTERED)
 ```
 
-Vehicles (capacity from the assumed bakkie deck 2.3 x 1.6 x 0.8 m and trailer 2.4 x 1.3 x 1.0 m, which
-**you must measure**): bakkie 2.9 m3 (base R450, R9/km, floor R600), bakkie + trailer 6.0 m3 (base R550, R10/km,
-floor R750).
+Vehicles: bakkie deck 2.785 x 1.63 m (published specification, 1 335 kg payload, 1 250 kg braked towing limit)
+with an ASSUMED 0.8 m stacking height = 3.6 m3 (base R450, R9/km, floor R600); closed trailer ASSUMED 2.4 x 1.3 x 1.2 m
+= 3.7 m3, so 7.3 m3 in total (base R550, R10/km, floor R750). Measure the stacking height and trailer.
 
 Load assistant: adds the m3 of the chosen items, then picks the smallest vehicle where
 `capacity x 0.85 >= volume`; otherwise the combo with `trips = ceil(volume / (capacity x 0.85))`.

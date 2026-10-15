@@ -81,6 +81,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 </a>
               </p>
             )}
+            <p className="mt-3 text-sm text-slate-300">Moves currently run on Sundays, 07:00 to 17:00.</p>
             {site.phone && (
               <p className="text-sm">
                 <a className="underline" href={`tel:${site.phone.replace(/\s/g, "")}`}>

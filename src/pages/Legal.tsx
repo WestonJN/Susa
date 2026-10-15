@@ -110,8 +110,16 @@ export function Terms() {
         <p>Quotes exclude packing, wrapping, dismantling and preparation services unless you chose Full service or arranged them separately.</p>
       </section>
       <section>
-        <H>Goods in transit</H>
-        <p>Goods-in-transit cover may be offered for an agreed declared value. If it is, the limits, exclusions and full terms are given to you in writing before your booking is confirmed. Please tell us about fragile, valuable or unusually heavy items.</p>
+        <H>Insurance and your belongings</H>
+        <p>We do not currently offer goods-in-transit insurance. We handle your belongings with care, but please make sure your own household contents insurance covers them while they are being moved. Tell us about fragile, valuable or unusually heavy items, and keep cash, jewellery and important documents with you.</p>
+      </section>
+      <section>
+        <H>What we move, and what we do not</H>
+        <p>We move household furniture, appliances and boxes, small office moves, furniture deliveries, and unwanted items or donations to a drop-off point you choose. We may refuse hazardous goods (gas, fuel, chemicals), firearms, perishable food, live animals and plants, and anything illegal or unsafe to carry.</p>
+      </section>
+      <section>
+        <H>Deposit</H>
+        <p>A 50% deposit confirms your booking once we have agreed the final price with you. We tell you how to pay when we confirm. The balance is due on the day of the move, unless we agree otherwise in writing.</p>
       </section>
       <section>
         <H>Changes and cancellations</H>
@@ -135,11 +143,11 @@ export function Cancellations() {
       <p>This policy applies to bookings confirmed with {site.name}. Requesting a quote is free and creates no obligation.</p>
       <section>
         <H>Cancelling or rescheduling</H>
-        <p>Tell us as early as you can, using the contact details on this website. Your booking confirmation sets out the cancellation window and any fee that applies. We will not charge a fee that is not in your confirmation.</p>
+        <p>Tell us as early as you can, using the contact details on this website. If you cancel or move your booking at least 48 hours before the start time, you can move the deposit to another available date at no cost, or have it refunded. If you cancel with less than 48 hours' notice, or the crew cannot start because access or the load is not ready, the deposit is not refunded.</p>
       </section>
       <section>
         <H>Refunds</H>
-        <p>If you pay a deposit and cancel within the window in your confirmation, the deposit is refunded in full to the account you paid from. Your confirmation says when. If we cancel or cannot do your move, we refund everything you have paid and help you find another date.</p>
+        <p>Refunds go back to the account you paid from, normally within 7 working days. The deposit is 50% of the confirmed price. If we cancel or cannot do your move, we refund everything you have paid and help you find another date.</p>
       </section>
       <section>
         <H>If something goes wrong</H>

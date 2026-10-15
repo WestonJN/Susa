@@ -62,6 +62,7 @@ export function organizationLd(site: Site): JsonLd {
     ...(site.phone ? { telephone: site.phone } : {}),
     ...(site.email ? { email: site.email } : {}),
     areaServed: { "@type": "City", name: "Johannesburg" },
+    openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "07:00", closes: "17:00" }],
     address: { "@type": "PostalAddress", addressLocality: "Johannesburg", addressRegion: "Gauteng", addressCountry: "ZA" },
   };
 }

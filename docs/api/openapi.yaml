@@ -242,7 +242,7 @@ components:
     QuoteRequestV1:
       type: object
       description: Mirrors `QuoteRequestV1` in `src/lib/api.ts`.
-      required: [schemaVersion, idempotencyKey, route, load, schedule, options, estimate, contact, consent, website]
+      required: [schemaVersion, idempotencyKey, route, load, schedule, estimate, contact, consent, website]
       additionalProperties: false
       properties:
         schemaVersion: { const: 1 }
@@ -277,14 +277,8 @@ components:
           required: [date, window]
           additionalProperties: false
           properties:
-            date: { type: string, format: date }
+            date: { type: string, format: date, description: "Currently only Sundays are accepted." }
             window: { type: string, maxLength: 60 }
-        options:
-          type: object
-          required: [goodsInTransitCoverRequested]
-          additionalProperties: false
-          properties:
-            goodsInTransitCoverRequested: { type: boolean }
         estimate:
           type: object
           description: Client estimate, advisory only. The server recomputes.

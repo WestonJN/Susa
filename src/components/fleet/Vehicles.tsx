@@ -1,4 +1,4 @@
-/** Flat side-view illustrations of the H100 dropside bakkie, alone and towing a closed trailer. Same scale in both. */
+/** Flat side-view illustrations of the dropside bakkie, alone and towing a closed trailer. Same scale in both. */
 const Wheel = ({ cx }: { cx: number }) => (
   <g>
     <circle cx={cx} cy={160} r={27} fill="#1b2a3a" />
@@ -47,8 +47,8 @@ function Trailer() {
 
 export function BakkieArt() {
   return (
-    <svg viewBox="0 0 660 190" role="img" aria-label="Illustration: white Hyundai H100 dropside bakkie, no trailer" className="h-auto w-full">
-      <title>Hyundai H100 dropside bakkie, no trailer</title>
+    <svg viewBox="0 0 660 190" role="img" aria-label="Illustration: white dropside bakkie, no trailer" className="h-auto w-full">
+      <title>Dropside bakkie, no trailer</title>
       <line x1={0} y1={187} x2={660} y2={187} stroke="#c3d3e3" strokeWidth={2} />
       <rect x={284} y={38} width={226} height={82} rx={7} fill="none" stroke="#9fb4c8" strokeWidth={1.5} strokeDasharray="6 6" opacity={0.7} transform="translate(-260 0)" />
       <text x={135} y={86} textAnchor="middle" fontSize={15} fontWeight={700} fill="#7b8da0" opacity={0.9}>no trailer</text>
@@ -60,7 +60,7 @@ export function BakkieArt() {
 export function ComboArt() {
   return (
     <svg viewBox="0 0 660 190" role="img" aria-label="Illustration: the same bakkie towing a closed box trailer" className="h-auto w-full">
-      <title>H100 bakkie towing a closed box trailer</title>
+      <title>Bakkie towing a closed box trailer</title>
       <line x1={0} y1={187} x2={660} y2={187} stroke="#c3d3e3" strokeWidth={2} />
       <Trailer />
       <Bakkie x={260} />

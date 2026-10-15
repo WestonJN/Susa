@@ -1,18 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { site } from "../../config/site";
-import { getTier, getVehicle, tiers, totalVolume, vehicles, type TierId } from "../../lib/catalog";
+import { getTier, getVehicle, rates, tiers, totalVolume, vehicles, type TierId } from "../../lib/catalog";
 import { calculateQuote, formatZar } from "../../lib/pricing";
 import { newIdempotencyKey, submitQuoteRequest, type QuoteRequestV1 } from "../../lib/api";
-import { clean, isEmail, isFutureOrToday, normaliseZaPhone, todayIso } from "../../lib/validation";
+import { clean, isBookableDay, isEmail, normaliseZaPhone, todayIso } from "../../lib/validation";
 import { Button, Counter, Field, inputClass } from "../ui";
 import { whatsappLink } from "../Layout";
 import { href } from "../../lib/url";
 import { LoadAssistant } from "./LoadAssistant";
 import { AddressSearch } from "./AddressSearch";
+import { DatePicker } from "./DatePicker";
 import { quickDistanceKm, routeDistanceKm, type Place } from "../../lib/geo";
 
 const STEPS = ["Route", "Vehicle", "Move details", "When", "Review"] as const;
-const WINDOWS = ["Early morning (06:00 to 09:00)", "Morning (09:00 to 12:00)", "Afternoon (12:00 to 16:00)", "Flexible"] as const;
+const WINDOWS = ["Morning (07:00 to 12:00)", "Afternoon (12:00 to 17:00)", "Flexible (07:00 to 17:00)"] as const;
 
 interface FormState {
   pickup: string;
@@ -29,7 +30,6 @@ interface FormState {
   trips: number;
   date: string;
   window: string;
-  cover: boolean;
   name: string;
   phone: string;
   email: string;
@@ -51,8 +51,7 @@ const initial: FormState = {
   floors: 0,
   trips: 1,
   date: "",
-  window: WINDOWS[1],
-  cover: false,
+  window: WINDOWS[0],
   name: "",
   phone: "",
   email: "",
@@ -72,7 +71,7 @@ function validate(step: number, s: FormState): Errors {
   }
   if (step === 1 && !s.vehicleId) e.vehicleId = "Choose the bakkie or the bakkie with trailer, or use the load assistant.";
   if (step === 3) {
-    if (!isFutureOrToday(s.date, todayIso())) e.date = "Pick the date of your move, today or later.";
+    if (!isBookableDay(s.date, todayIso(), site.bookingDays)) e.date = "Pick one of the highlighted dates in the calendar.";
   }
   if (step === 4) {
     if (clean(s.name, 100).length < 2) e.name = "Enter your name.";
@@ -90,12 +89,12 @@ export function QuoteForm() {
   const [assistant, setAssistant] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "fallback" | "error">("idle");
   const [reference, setReference] = useState("");
-  const [minDate, setMinDate] = useState("");
   const [key] = useState(newIdempotencyKey);
   const [routeNote, setRouteNote] = useState("");
   const [distanceAuto, setDistanceAuto] = useState(false);
 
-  useEffect(() => setMinDate(todayIso()), []);
+  const maxHelpers = Math.max(0, rates.maxCrew - getTier(s.tier).crew);
+  const helpers = Math.min(s.helpers, maxHelpers);
   const patch = (p: Partial<FormState>) => setS((prev) => ({ ...prev, ...p }));
 
   // Work out the driving distance as soon as both addresses were picked from the search.
@@ -129,14 +128,14 @@ export function QuoteForm() {
         tier: s.tier,
         distanceKm: s.distanceKm ? Number(s.distanceKm) : null,
         tollEstimate: Math.max(0, Number(s.tollEstimate) || 0),
-        helpers: s.helpers,
+        helpers,
         floors: s.floors,
         trips: s.trips,
         volumeM3: volume,
         vatRegistered: site.vatRegistered,
         vatRate: site.vatRate,
       }),
-    [s.vehicleId, s.tier, s.distanceKm, s.tollEstimate, s.helpers, s.floors, s.trips, volume],
+    [s.vehicleId, s.tier, s.distanceKm, s.tollEstimate, helpers, s.floors, s.trips, volume],
   );
 
   function next() {
@@ -152,9 +151,8 @@ export function QuoteForm() {
       `From: ${clean(s.pickup)}`,
       `To: ${clean(s.dropoff)} (about ${s.distanceKm} km)`,
       `Vehicle: ${v?.name ?? "not chosen"} x ${s.trips} trip(s), ${getTier(s.tier).name}`,
-      `Extra helpers: ${s.helpers}, floors: ${s.floors}`,
+      `Extra helpers: ${helpers}, floors: ${s.floors}`,
       `Date: ${s.date}, ${s.window}`,
-      s.cover ? "Goods-in-transit cover: requested" : "",
       quote.status !== "incomplete" ? `Online estimate: ${formatZar(quote.total)} (not confirmed)` : "",
       `Name: ${clean(s.name, 100)}`,
       `Mobile: ${clean(s.phone, 20)}`,
@@ -183,9 +181,8 @@ export function QuoteForm() {
         distanceKm: Number(s.distanceKm),
         tollEstimate: Math.max(0, Number(s.tollEstimate) || 0),
       },
-      load: { vehicleId: s.vehicleId, tier: s.tier, trips: s.trips, helpers: s.helpers, floors: s.floors, volumeM3: volume, items: Object.fromEntries(Object.entries(s.items).filter(([, n]) => n > 0)) },
+      load: { vehicleId: s.vehicleId, tier: s.tier, trips: s.trips, helpers, floors: s.floors, volumeM3: volume, items: Object.fromEntries(Object.entries(s.items).filter(([, n]) => n > 0)) },
       schedule: { date: s.date, window: s.window },
-      options: { goodsInTransitCoverRequested: s.cover },
       estimate: { total: quote.total, status: quote.status, confidence: quote.confidence, reasons: quote.reasons },
       contact: { name: clean(s.name, 100), phone, email: s.email.trim() ? s.email.trim().toLowerCase() : null },
       consent: { privacyNoticeVersion: site.consentVersion, acceptedAt: new Date().toISOString() },
@@ -381,7 +378,7 @@ export function QuoteForm() {
                 ))}
               </div>
             </fieldset>
-            <Counter label="Additional helpers" hint="On top of any crew in your service level." value={s.helpers} max={10} onChange={(n) => patch({ helpers: n })} />
+            <Counter label="Additional helpers" hint={maxHelpers === 0 ? "Your service level already has our maximum crew of two, not counting the driver." : "Up to two movers in total, not counting the driver."} value={helpers} max={maxHelpers} onChange={(n) => patch({ helpers: n })} />
             <Counter label="Floors (stairs, no lift)" hint="Count floors the crew must carry up or down." value={s.floors} max={20} onChange={(n) => patch({ floors: n })} />
             <Counter label="Number of trips" hint="Use more than one if your load will not fit in one go." value={s.trips} min={1} max={10} onChange={(n) => patch({ trips: n })} />
             <button type="button" className="font-semibold text-brand-600 underline" onClick={() => setAssistant(true)}>
@@ -393,8 +390,8 @@ export function QuoteForm() {
         {step === 3 && (
           <div className="space-y-5">
             <h2 className="text-xl font-bold text-brand-900">When do you need us?</h2>
-            <Field label="Date of move" htmlFor="date" error={errors.date} hint="Our team confirms this date is available.">
-              <input id="date" type="date" min={minDate} className={inputClass} value={s.date} onChange={(e) => patch({ date: e.target.value })} />
+            <Field label="Date of move" htmlFor="date" error={errors.date} hint="Our team confirms the date with you before anything is booked.">
+              <DatePicker id="date" value={s.date} invalid={!!errors.date} onChange={(d) => patch({ date: d })} />
             </Field>
             <Field label="Preferred arrival window" htmlFor="window" hint="Our team confirms the actual time with you.">
               <select id="window" className={inputClass} value={s.window} onChange={(e) => patch({ window: e.target.value })}>
@@ -403,13 +400,9 @@ export function QuoteForm() {
                 ))}
               </select>
             </Field>
-            <label className="flex items-start gap-3">
-              <input type="checkbox" className="mt-1 h-5 w-5" checked={s.cover} onChange={(e) => patch({ cover: e.target.checked })} />
-              <span>
-                <span className="font-semibold">Request goods-in-transit cover</span>
-                <span className="block text-sm text-slate-600">Tick this if you want cover. Our team tells you whether it is available, with its limits and exclusions, before you book.</span>
-              </span>
-            </label>
+            <p className="rounded-xl bg-brand-50 p-3 text-sm text-slate-700">
+              We do not currently offer goods-in-transit insurance. Please check that your own contents insurance covers your things while they are being moved.
+            </p>
           </div>
         )}
 
@@ -472,6 +465,7 @@ export function QuoteForm() {
               <div>
                 <div className="text-xs uppercase tracking-wide text-slate-500">Estimate{site.vatRegistered ? " incl. VAT" : ""}</div>
                 <div className="text-2xl font-extrabold text-brand-900">{formatZar(quote.total)}</div>
+                <div className="text-xs text-slate-600">50% deposit to confirm: {formatZar(quote.deposit)}</div>
               </div>
               <details className="max-w-[60%] text-right text-sm">
                 <summary className="cursor-pointer font-semibold text-brand-600">How it adds up</summary>

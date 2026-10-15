@@ -27,7 +27,6 @@ export interface QuoteRequestV1 {
     items: Record<string, number>;
   };
   schedule: { date: string; window: string };
-  options: { goodsInTransitCoverRequested: boolean };
   estimate: { total: number; status: string; confidence: number; reasons: string[] };
   contact: { name: string; phone: string; email: string | null };
   consent: { privacyNoticeVersion: string; acceptedAt: string };

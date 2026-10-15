@@ -27,6 +27,8 @@ export interface QuoteResult {
   subtotal: number;
   vat: number;
   total: number;
+  /** Deposit to confirm a booking (a share of the total, to the nearest R10). */
+  deposit: number;
   /** 0..1. Below rates.autoApproveConfidence the quote is routed to a human. */
   confidence: number;
   /** Human-readable reasons shown to the customer and the approval queue. */
@@ -37,7 +39,7 @@ const clampInt = (n: number, min: number, max: number) =>
   Math.min(max, Math.max(min, Number.isFinite(n) ? Math.trunc(n) : min));
 const round10 = (n: number) => Math.round(n / 10) * 10;
 
-const EMPTY: QuoteResult = { status: "incomplete", lines: [], subtotal: 0, vat: 0, total: 0, confidence: 0, reasons: [] };
+const EMPTY: QuoteResult = { status: "incomplete", lines: [], subtotal: 0, vat: 0, total: 0, deposit: 0, confidence: 0, reasons: [] };
 
 /**
  * Pure, deterministic price calculation with built-in circuit breakers:
@@ -52,7 +54,7 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
 
   const tier = getTier(input.tier);
   const trips = clampInt(input.trips, 1, 10);
-  const helpers = clampInt(input.helpers, 0, 10);
+  const helpers = clampInt(input.helpers, 0, Math.max(0, rates.maxCrew - getTier(input.tier).crew));
   const floors = clampInt(input.floors, 0, 20);
   const reasons: string[] = [];
   let confidence = 1;
@@ -123,6 +125,7 @@ export function calculateQuote(input: QuoteInput): QuoteResult {
     subtotal,
     vat,
     total: subtotal + vat,
+    deposit: round10((subtotal + vat) * rates.depositShare),
     confidence,
     reasons,
   };

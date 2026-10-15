@@ -5,7 +5,7 @@ import { Container, LinkButton } from "../ui";
 import { BakkieArt, ComboArt } from "./Vehicles";
 import { IsoIcon, boxes, diningTable, mattress, officeDesk, queenBed, sofa3, studentDesk, washerDryer, type Cuboid } from "./iso";
 
-// Vehicle pictures: src/assets/fleet/bakkie.(jpg|png|webp) and bakkie-trailer.(jpg|png|webp). Drawn art is the fallback.
+// Real photos: put bakkie.(jpg|png|webp) and bakkie-trailer.(jpg|png|webp) of your own vehicle in src/assets/fleet/. Drawn art is shown until then.
 const photos = import.meta.glob("/src/assets/fleet/*.{jpg,jpeg,png,webp}", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
 const photo = (name: string) => Object.entries(photos).find(([p]) => new RegExp(`/${name}\\.(jpg|jpeg|png|webp)$`).test(p))?.[1];
 
@@ -55,15 +55,15 @@ export function FleetShowcase() {
     <section className="bg-white py-12 sm:py-16" aria-labelledby="fleet-title">
       <Container>
         <p className="text-sm font-semibold uppercase tracking-widest text-brand-500">Our vehicles</p>
-        <h2 id="fleet-title" className="mt-2 text-3xl font-extrabold tracking-tight text-brand-900 sm:text-4xl">H100 Workhorse &amp; Trailer</h2>
+        <h2 id="fleet-title" className="mt-2 text-3xl font-extrabold tracking-tight text-brand-900 sm:text-4xl">The Workhorse &amp; Trailer</h2>
         <p className="mt-3 max-w-2xl text-slate-600">
-          Our Hyundai H100 Workhorse does the small jobs on its own. Add the trailer, specifically designed for furniture transport, when there is more to move. Bigger moves can be split over several trips.
+          Our 1.3 ton bakkie, the Workhorse, does the small jobs on its own. Add the trailer, specifically designed for furniture transport, when there is more to move. Bigger moves can be split over several trips.
         </p>
 
         <div className="relative mt-8 grid gap-4 lg:grid-cols-2 lg:gap-8">
           <Panel
-            title="Hyundai H100 bakkie (1.3 ton)" cols="grid-cols-2 sm:grid-cols-4"
-            art={img(photo("bakkie"), "White Hyundai H100 dropside bakkie", <BakkieArt />)}
+            title="1.3 ton bakkie" cols="grid-cols-2 sm:grid-cols-4"
+            art={img(photo("bakkie"), "White dropside bakkie", <BakkieArt />)}
             examples={bakkieExamples}
             callout={<><strong>OPEN DROPSIDE:</strong> Best for student rooms, large appliances, or quick, stackable loads. Protected by waterproof tarps.</>}
           />
@@ -75,8 +75,8 @@ export function FleetShowcase() {
             <div className="text-2xl font-black text-brand-500">~{ratio}X</div>
           </div>
           <Panel
-            title="H100 bakkie + custom box trailer" cols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5"
-            art={img(photo("bakkie-trailer"), "The same H100 bakkie towing a closed box trailer", <ComboArt />)}
+            title="1.3 ton bakkie + box trailer" cols="grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5"
+            art={img(photo("bakkie-trailer"), "The same bakkie towing a closed box trailer", <ComboArt />)}
             examples={comboExamples}
             callout={<><strong>EXPANDED CLOSED VOLUME:</strong> Perfect for one-bedroom homes, apartments, or bulky furniture requiring weather protection.</>}
           />

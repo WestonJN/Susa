@@ -26,3 +26,12 @@ export function todayIso(now = new Date()): string {
   // Africa/Johannesburg date regardless of the device timezone.
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Johannesburg" }).format(now);
 }
+
+/** Day of week (0 = Sunday) for an ISO date, independent of timezone. */
+export function weekdayOf(isoDate: string): number {
+  return new Date(`${isoDate}T00:00:00Z`).getUTCDay();
+}
+
+export function isBookableDay(isoDate: string, today: string, days: readonly number[]): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(isoDate) && isoDate > today && days.includes(weekdayOf(isoDate));
+}

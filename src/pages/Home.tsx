@@ -13,7 +13,9 @@ const steps = [
 const faqs = [
   { q: "Is the online price final?", a: "No. It is an estimate. Our team confirms availability and the final price before your booking is locked in. Asking for a quote is free and you are not charged." },
   { q: "What happens after I send my request?", a: "Once we receive it, our team checks availability and contacts you to confirm the final price. Your move is booked only when that is agreed. Depending on how you send it, you may need to press send in WhatsApp or your email app." },
-  { q: "Which vehicles do you use?", a: "One Hyundai H100 dropside bakkie (1.3 ton), on its own or towing a closed box trailer that is specifically designed for furniture transport." },
+  { q: "Which days do you move?", a: "Online bookings are currently open on the highlighted dates in the quote calendar. Our team confirms your date and arrival time with you before anything is booked." },
+  { q: "Do I pay a deposit?", a: "A 50% deposit confirms your booking once our team has agreed the final price with you. Your estimate shows the deposit amount. See the cancellation and refund policy for the details." },
+  { q: "Which vehicles do you use?", a: "One 1.3 ton dropside bakkie, on its own or towing a closed box trailer that is specifically designed for furniture transport." },
   { q: "How do I know which vehicle I need?", a: "Use the load assistant. Add your furniture and boxes and it suggests the bakkie or the bakkie with trailer, and how many helpers to add." },
   { q: "Does the quote include packing?", a: "Packing, wrapping and dismantling are included only in the Full service option. If you want them without Full service, ask our team when you send your request." },
   { q: "Do you move offices as well as homes?", a: "Yes, small offices and business deliveries that fit the bakkie or the bakkie with trailer. Bigger loads can be split over several trips. You use the same quote form." },

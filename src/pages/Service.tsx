@@ -27,10 +27,10 @@ export const services: Record<ServiceContent["slug"], ServiceContent> = {
     metaTitle: "Home Moving & Furniture Removals in Johannesburg",
     metaDescription: "Home moving and furniture removals in Johannesburg by bakkie or bakkie with trailer. Add a crew if you need one, see your estimate and request a quote.",
     points: [
-      { title: "Two vehicle options", body: "A Hyundai H100 dropside bakkie for a few items or a student room. Or the same bakkie with a closed trailer, specifically designed for furniture transport, for a small one-bedroom home. Bigger loads can be split over several trips." },
+      { title: "Two vehicle options", body: "A 1.3 ton dropside bakkie for a few items or a student room. Or the same bakkie with a closed trailer, specifically designed for furniture transport, for a small one-bedroom home. Bigger loads can be split over several trips." },
       { title: "Crew when you need it", body: "Choose transport only, a loading crew, or full service with packing. Add extra helpers if you have heavy items or many floors." },
       { title: "Stairs and access in your estimate", body: "Tell us how many floors the crew must carry up, and about any estate or complex rules. Stairs affect crew time, so they show as a line in your estimate." },
-      { title: "Goods-in-transit cover on request", body: "You can ask for goods-in-transit cover on the quote form. Our team tells you whether it is available, and its limits and exclusions, in writing before you book." },
+      { title: "Your belongings", body: "We handle your things with care. We do not currently offer goods-in-transit insurance, so please check that your own contents insurance covers a move." },
     ],
     included: ["A vehicle and driver for your route", "Distance-based pricing, with any tolls you enter shown separately", "A crew and extra helpers, if you choose them"],
     notIncluded: ["Packing, wrapping and dismantling, unless you choose Full service", "Storage", "Permits or building deposits that your complex asks for"],

@@ -26,13 +26,14 @@ export interface Vehicle {
 }
 
 /**
- * Sizing is anchored on the vehicle we run today: a Hyundai H100 dropside bakkie plus a closed
- * medium trailer. These dimensions are ASSUMPTIONS (typical for the class), not measurements:
- * measure the real deck and trailer and change the numbers below. Everything else follows.
+ * Sizing is anchored on the vehicle we run today: a 1.3 ton dropside bakkie plus a closed box trailer.
+ * Deck length and width are the manufacturer's published figures (2 785 x 1 630 mm, 1 335 kg payload,
+ * 1 250 kg braked towing limit). STILL ASSUMED, please measure: the practical stacking height on the
+ * deck (the dropsides are only 355 mm, loads are stacked above them and tarped) and the trailer box.
  * Add bigger classes here only when you actually own or partner for them.
  */
-export const BAKKIE_DECK = { lengthM: 2.3, widthM: 1.6, loadHeightM: 0.8 } as const;
-export const TRAILER_BOX = { lengthM: 2.4, widthM: 1.3, heightM: 1.0 } as const;
+export const BAKKIE_DECK = { lengthM: 2.785, widthM: 1.63, loadHeightM: 0.8 } as const;
+export const TRAILER_BOX = { lengthM: 2.4, widthM: 1.3, heightM: 1.2 } as const;
 const round1 = (n: number) => Math.round(n * 10) / 10;
 export const H100_M3 = round1(BAKKIE_DECK.lengthM * BAKKIE_DECK.widthM * BAKKIE_DECK.loadHeightM);
 export const TRAILER_M3 = round1(TRAILER_BOX.lengthM * TRAILER_BOX.widthM * TRAILER_BOX.heightM);
@@ -40,10 +41,10 @@ export const TRAILER_M3 = round1(TRAILER_BOX.lengthM * TRAILER_BOX.widthM * TRAI
 export const vehicles: readonly Vehicle[] = [
   {
     id: "h100",
-    name: "Hyundai H100 bakkie",
+    name: "1.3 ton bakkie",
     tonnage: "1.3 ton",
     bestFor: "A few items, a student room or large appliances. The open dropside makes tall and awkward items easy to load.",
-    spec: `Open dropside, about ${H100_M3} m³ of load space`,
+    spec: `Open dropside deck, about ${BAKKIE_DECK.lengthM.toFixed(1)} m x ${BAKKIE_DECK.widthM.toFixed(1)} m, around ${H100_M3} m³ of load space`,
     capacityM3: H100_M3,
     baseFee: 450,
     perKm: 9,
@@ -52,7 +53,7 @@ export const vehicles: readonly Vehicle[] = [
   },
   {
     id: "h100_trailer",
-    name: "H100 bakkie with trailer",
+    name: "1.3 ton bakkie with trailer",
     tonnage: "Bakkie towing a closed box trailer",
     bestFor: "One-bedroom homes and bulky furniture. The closed trailer is specifically designed for furniture transport and protects your things from the weather.",
     spec: `Bakkie and closed trailer, about ${(H100_M3 + TRAILER_M3).toFixed(1)} m³ in total`,
@@ -72,7 +73,7 @@ export interface Tier {
   id: TierId;
   name: string;
   summary: string;
-  /** Crew members included with the tier (on top of any extra helpers). */
+  /** Movers included with the tier, not counting the driver. Tier crew plus helpers never exceeds rates.maxCrew. */
   crew: number;
   packing: boolean;
 }
@@ -88,15 +89,15 @@ export const tiers: readonly Tier[] = [
   {
     id: "loading",
     name: "Transport + loading crew",
-    summary: "Vehicle, driver and a two-person crew to load and unload.",
+    summary: "Vehicle, driver and a two-person crew to load and unload (the driver is extra to the crew).",
     crew: 2,
     packing: false,
   },
   {
     id: "full",
     name: "Full service",
-    summary: "Vehicle, driver and a three-person crew, plus packing, wrapping and dismantling.",
-    crew: 3,
+    summary: "Vehicle, driver and a two-person crew, plus packing, wrapping and dismantling.",
+    crew: 2,
     packing: true,
   },
 ] as const;
@@ -118,6 +119,10 @@ export const rates = {
   /** Beyond this road distance the route is treated as outside Johannesburg and priced by a person. */
   longDistanceKm: 60,
   maxFloors: 4,
+  /** Most movers we send on one job, not counting the driver. */
+  maxCrew: 2,
+  /** Share of the total paid as a deposit to confirm a booking. */
+  depositShare: 0.5,
 } as const;
 
 export interface CatalogItem {
@@ -268,8 +273,8 @@ export function recommendLoad(items: Record<string, number>): LoadRecommendation
 
   let helpers = 0;
   if (volume > 3 || heavy > 0) helpers = 1;
-  if (volume > 10 || heavy >= 3) helpers = 2;
-  if (volume > 22 || heavy >= 6) helpers = 3;
+  if (volume > 8 || heavy >= 3) helpers = 2;
+  helpers = Math.min(helpers, rates.maxCrew);
 
   return { volumeM3: volume, vehicleId: vehicle.id, trips, helpers };
 }
