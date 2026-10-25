@@ -21,6 +21,13 @@
   }
   body {
     @apply bg-slate-50 text-slate-800 antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-accent-600;

@@ -2,6 +2,8 @@ import { areas } from "../content/areas";
 import { href } from "../lib/url";
 import { Container, LinkButton, Section } from "../components/ui";
 import { FleetShowcase } from "../components/fleet/FleetShowcase";
+import { ComboArt } from "../components/fleet/Vehicles";
+import { photo } from "../components/fleet/photos";
 
 const steps = [
   { t: "Add your addresses", d: "Type the pick-up and drop-off, then pick each one from the list. We work out the driving distance for you." },
@@ -23,23 +25,46 @@ const faqs = [
   { q: "How do you handle my personal information?", a: "We collect only what we need to prepare your quote and plan your move, and we handle it under POPIA. Read the privacy notice for details and your rights." },
 ];
 
+const FIRST_FAQS = 6;
+
+function Faq({ f }: { f: { q: string; a: string } }) {
+  return (
+    <details className="group p-5">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold text-brand-900">
+        {f.q}
+        <span aria-hidden="true" className="text-2xl font-normal text-slate-500 transition-transform group-open:rotate-45">+</span>
+      </summary>
+      <p className="mt-2 max-w-2xl text-slate-700">{f.a}</p>
+    </details>
+  );
+}
+
 export function Home() {
+  const hero = photo("bakkie-trailer");
   return (
     <>
-      <section className="bg-brand-900 text-white">
-        <Container className="py-14 sm:py-20">
-          <p className="text-sm font-semibold uppercase tracking-widest text-accent-400">Johannesburg removals and truck transport</p>
-          <h1 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight sm:text-5xl">
-            Furniture removals in Johannesburg, with a clear price estimate.
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-slate-200">
-            Add your addresses, choose a bakkie or a bakkie with trailer, see how your estimate is built and send your request from your phone.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <LinkButton href={href("/get-quote/")}>Get a quote</LinkButton>
-            <LinkButton href={href("/services/home-moving/")} variant="ghost" className="!bg-transparent !text-white !border-white/40 hover:!bg-white/10">
-              How home moving works
-            </LinkButton>
+      <section className="bg-slate-50">
+        <Container className="grid items-center gap-10 py-16 sm:py-24 lg:grid-cols-2">
+          <div>
+            <h1 className="max-w-xl text-5xl font-semibold leading-[1.08] tracking-tight text-brand-900 sm:text-6xl">
+              Clear prices for Johannesburg moves.
+            </h1>
+            <p className="mt-6 max-w-md text-xl text-slate-600">
+              Furniture removals with a bakkie, or a bakkie and trailer. See how your estimate is built and send your request from your phone.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <LinkButton href={href("/get-quote/")} className="rounded-full px-7">Get a quote</LinkButton>
+              <a href={href("/services/home-moving/")} className="inline-flex min-h-11 items-center font-semibold text-brand-600 hover:underline">
+                How home moving works <span aria-hidden="true" className="ml-1">&rsaquo;</span>
+              </a>
+            </div>
+          </div>
+          <div>
+            {hero ? (
+              <img src={hero} alt="Our white bakkie towing a closed box trailer" width={620} height={277} fetchPriority="high" className="h-auto w-full rounded-2xl" />
+            ) : (
+              <ComboArt />
+            )}
           </div>
         </Container>
       </section>
@@ -47,10 +72,10 @@ export function Home() {
       <Section title="How it works" tone="white">
         <ol className="grid gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
-            <li key={s.t} className="flex gap-4 rounded-2xl border border-slate-200 p-4">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-900 font-bold text-white">{i + 1}</span>
+            <li key={s.t} className="flex gap-4 rounded-2xl bg-slate-50 p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-900 font-semibold text-white">{i + 1}</span>
               <div>
-                <h3 className="font-bold text-brand-900">{s.t}</h3>
+                <h3 className="text-lg font-semibold text-brand-900">{s.t}</h3>
                 <p className="mt-1 text-slate-600">{s.d}</p>
               </div>
             </li>
@@ -60,12 +85,6 @@ export function Home() {
 
       <FleetShowcase />
 
-      <Section>
-        <p className="text-slate-600">
-          Need to move just one or two items? We also do <a className="font-semibold text-brand-600 underline" href={href("/services/truck-hire/")}>truck transport and furniture delivery</a>, donation runs and large items.
-        </p>
-      </Section>
-
       <Section id="areas" title="Where we move" intro="We currently move homes and small offices within Johannesburg only. Access rules differ from building to building, so we share what to expect." tone="white">
         <ul className="flex flex-wrap gap-2">
           {areas[0]?.nearby.map((n) => (
@@ -73,23 +92,29 @@ export function Home() {
           ))}
         </ul>
         <p className="mt-6">
-          <a href={href("/areas/johannesburg/")} className="font-semibold text-brand-600 underline">Moving in Johannesburg: what to know</a>
+          <a href={href("/areas/johannesburg/")} className="inline-flex min-h-11 items-center font-semibold text-brand-600 hover:underline">Moving in Johannesburg: what to know <span aria-hidden="true" className="ml-1">&rsaquo;</span></a>
         </p>
       </Section>
 
       <Section title="Common questions">
         <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
-          {faqs.map((f) => (
-            <details key={f.q} className="group p-4">
-              <summary className="cursor-pointer list-none font-semibold text-brand-900">{f.q}</summary>
-              <p className="mt-2 text-slate-700">{f.a}</p>
-            </details>
-          ))}
-        </div>
-        <div className="mt-8">
-          <LinkButton href={href("/get-quote/")}>Get a quote</LinkButton>
+          {faqs.slice(0, FIRST_FAQS).map((f) => <Faq key={f.q} f={f} />)}
+          <details className="group">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center px-5 font-semibold text-brand-600 group-open:hidden">See all questions</summary>
+            <div className="divide-y divide-slate-200">
+              {faqs.slice(FIRST_FAQS).map((f) => <Faq key={f.q} f={f} />)}
+            </div>
+          </details>
         </div>
       </Section>
+
+      <section className="bg-brand-900 py-16 text-center text-white sm:py-24">
+        <Container>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Ready to see your price?</h2>
+          <p className="mx-auto mt-3 max-w-md text-lg text-slate-200">Asking for a quote is free. We confirm availability and the final price before anything is booked.</p>
+          <div className="mt-8"><LinkButton href={href("/get-quote/")} className="rounded-full px-7">Get a quote</LinkButton></div>
+        </Container>
+      </section>
     </>
   );
 }

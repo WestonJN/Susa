@@ -40,7 +40,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <Logo />
           <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
             {nav.map((n) => (
-              <a key={n.to} href={href(n.to)} className="text-sm font-medium text-slate-700 hover:text-brand-600">
+              <a key={n.to} href={href(n.to)} className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 hover:text-brand-600">
                 {n.label}
               </a>
             ))}
@@ -69,14 +69,14 @@ export function Layout({ children }: { children: ReactNode }) {
 
       <main id="main">{children}</main>
 
-      <footer className="mt-8 bg-brand-900 text-slate-200">
+      <footer className="bg-brand-900 text-slate-200">
         <Container className="grid gap-8 py-12 sm:grid-cols-3">
           <div>
             <div className="text-lg font-bold text-white">{site.name}</div>
             <p className="mt-2 text-sm text-slate-300">{site.tagline}.</p>
             {site.email && (
               <p className="mt-3 text-sm">
-                <a className="underline" href={`mailto:${site.email}`}>
+                <a className="inline-flex min-h-11 items-center underline" href={`mailto:${site.email}`}>
                   {site.email}
                 </a>
               </p>
@@ -84,7 +84,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <p className="mt-3 text-sm text-slate-300">Moves currently run on Sundays, 07:00 to 17:00.</p>
             {site.phone && (
               <p className="text-sm">
-                <a className="underline" href={`tel:${site.phone.replace(/\s/g, "")}`}>
+                <a className="inline-flex min-h-11 items-center underline" href={`tel:${site.phone.replace(/\s/g, "")}`}>
                   {site.phone}
                 </a>
               </p>
@@ -92,10 +92,10 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
           <nav aria-label="Service areas">
             <div className="font-semibold text-white">Where we move</div>
-            <ul className="mt-2 space-y-1 text-sm">
+            <ul className="mt-2 text-sm">
               {areas.map((a) => (
                 <li key={a.slug}>
-                  <a className="hover:underline" href={href(`/areas/${a.slug}/`)}>
+                  <a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href(`/areas/${a.slug}/`)}>
                     Movers in {a.name}
                   </a>
                 </li>
@@ -104,18 +104,18 @@ export function Layout({ children }: { children: ReactNode }) {
           </nav>
           <nav aria-label="Quotes and policies">
             <div className="font-semibold text-white">Quotes and policies</div>
-            <ul className="mt-2 space-y-1 text-sm">
-              <li><a className="hover:underline" href={href("/get-quote/")}>Get a quote</a></li>
-              <li><a className="hover:underline" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
-              <li><a className="hover:underline" href={href("/privacy/")}>Privacy notice (POPIA)</a></li>
-              <li><a className="hover:underline" href={href("/terms/")}>Terms of service</a></li>
-              <li><a className="hover:underline" href={href("/cancellations/")}>Cancellations and refunds</a></li>
-              <li><a className="hover:underline" href={href("/cookies/")}>Cookie policy</a></li>
-              <li><a className="hover:underline" href={href("/data-request/")}>Your data: access, correct or delete</a></li>
+            <ul className="mt-2 text-sm">
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/get-quote/")}>Get a quote</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/privacy/")}>Privacy notice (POPIA)</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/terms/")}>Terms of service</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/cancellations/")}>Cancellations and refunds</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/cookies/")}>Cookie policy</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/data-request/")}>Your data: access, correct or delete</a></li>
             </ul>
           </nav>
         </Container>
-        <div className="border-t border-white/10 py-4 px-4 text-center text-xs text-slate-300">
+        <div className="border-t border-white/10 py-4 px-4 text-center text-[13px] text-slate-300">
           © {new Date().getFullYear()} {site.legalName || site.name}.
           {site.regNumber && <> Reg. {site.regNumber}.</>}
           {site.vatNumber && <> VAT {site.vatNumber}.</>}
@@ -128,9 +128,9 @@ export function Layout({ children }: { children: ReactNode }) {
           href={wa}
           rel="noopener"
           aria-label="Chat on WhatsApp"
-          className="fixed bottom-4 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] shadow-lg"
+          className="fixed bottom-4 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] shadow-lg"
         >
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
             <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.3 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.4-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z" />
           </svg>
         </a>

@@ -58,10 +58,10 @@ export function Section({
   tone?: "light" | "white";
 }) {
   return (
-    <section id={id} className={tone === "white" ? "bg-white py-12 sm:py-16" : "py-12 sm:py-16"}>
+    <section id={id} className={tone === "white" ? "bg-white py-16 sm:py-24" : "bg-slate-50 py-16 sm:py-24"}>
       <Container>
-        {title && <h2 className="text-2xl font-bold tracking-tight text-brand-900 sm:text-3xl">{title}</h2>}
-        {intro && <p className="mt-3 max-w-2xl text-slate-600">{intro}</p>}
+        {title && <h2 className="text-3xl font-semibold tracking-tight text-brand-900 sm:text-4xl">{title}</h2>}
+        {intro && <p className="mt-3 max-w-2xl text-lg text-slate-600">{intro}</p>}
         <div className={title ? "mt-8" : ""}>{children}</div>
       </Container>
     </section>
