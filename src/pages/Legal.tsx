@@ -10,11 +10,11 @@ const updated = () => {
   const [y, m, d] = site.consentVersion.split("-").map(Number);
   return y && m && d ? `${d} ${MONTHS[m - 1]} ${y}` : site.consentVersion;
 };
-const H = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-bold text-brand-900">{children}</h2>;
+const H = ({ children }: { children: ReactNode }) => <h2 className="text-xl font-semibold text-brand-900">{children}</h2>;
 const A = ({ to, children }: { to: string; children: ReactNode }) => <a className="font-semibold text-brand-600 underline" href={href(to)}>{children}</a>;
 const Page = ({ title, children }: { title: string; children: ReactNode }) => (
-  <Container className="max-w-3xl py-10 sm:py-14">
-    <h1 className="text-3xl font-extrabold text-brand-900">{title}</h1>
+  <Container className="max-w-3xl py-14 sm:py-20">
+    <h1 className="text-4xl font-semibold tracking-tight text-brand-900">{title}</h1>
     <p className="mt-2 text-sm text-slate-600">Last updated {updated()}</p>
     <div className="mt-6 space-y-5 text-slate-700">{children}</div>
     <p className="mt-8 text-sm text-slate-600">Questions about this page? Contact {contact()}.</p>

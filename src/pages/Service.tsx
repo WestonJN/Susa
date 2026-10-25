@@ -74,22 +74,22 @@ export function ServicePage({ slug }: { slug: ServiceContent["slug"] }) {
   const s = services[slug];
   return (
     <>
-      <Container className="py-10 sm:py-14">
-        <nav aria-label="Breadcrumb" className="text-sm text-slate-500">
-          <a className="underline" href={href("/")}>Home</a> / {s.name}
+      <Container className="py-14 sm:py-20">
+        <nav aria-label="Breadcrumb" className="text-sm text-slate-600">
+          <a className="inline-flex min-h-11 items-center underline" href={href("/")}>Home</a> / {s.name}
         </nav>
-        <h1 className="mt-3 max-w-3xl text-3xl font-extrabold text-brand-900 sm:text-4xl">{s.h1}</h1>
-        <p className="mt-3 max-w-2xl text-lg text-slate-600">{s.lead}</p>
+        <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-brand-900 sm:text-5xl">{s.h1}</h1>
+        <p className="mt-4 max-w-2xl text-xl text-slate-600">{s.lead}</p>
         <div className="mt-6">
-          <LinkButton href={href("/get-quote/")}>Get a quote</LinkButton>
+          <LinkButton href={href("/get-quote/")} className="rounded-full px-7">Get a quote</LinkButton>
           <p className="mt-2 text-sm text-slate-600">Free to request. Not a booking.</p>
         </div>
       </Container>
       <Section tone="white">
         <div className="grid gap-4 sm:grid-cols-2">
           {s.points.map((p) => (
-            <article key={p.title} className="rounded-2xl border border-slate-200 p-5">
-              <h2 className="text-lg font-bold text-brand-900">{p.title}</h2>
+            <article key={p.title} className="rounded-2xl bg-slate-50 p-6">
+              <h2 className="text-lg font-semibold text-brand-900">{p.title}</h2>
               <p className="mt-2 text-slate-700">{p.body}</p>
             </article>
           ))}
@@ -98,11 +98,11 @@ export function ServicePage({ slug }: { slug: ServiceContent["slug"] }) {
       <Section>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
-            <h2 className="text-xl font-bold text-brand-900">What your estimate includes</h2>
+            <h2 className="text-xl font-semibold text-brand-900">What your estimate includes</h2>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-slate-700">{s.included.map((x) => <li key={x}>{x}</li>)}</ul>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-brand-900">What is not included</h2>
+            <h2 className="text-xl font-semibold text-brand-900">What is not included</h2>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-slate-700">{s.notIncluded.map((x) => <li key={x}>{x}</li>)}</ul>
           </div>
         </div>

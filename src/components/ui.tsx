@@ -5,7 +5,7 @@ export function Container({ children, className = "" }: { children: ReactNode; c
 }
 
 const buttonBase =
-  "inline-flex min-h-12 items-center justify-center rounded-xl px-5 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center rounded-full px-6 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
 const variants = {
   primary: "bg-accent-500 text-brand-900 hover:bg-accent-400",
   secondary: "bg-brand-900 text-white hover:bg-brand-700",

@@ -30,10 +30,10 @@ export function DatePicker({ value, onChange, id, invalid }: { value: string; on
     <div id={id} className={`rounded-xl border bg-white p-3 ${invalid ? "border-red-600" : "border-slate-300"}`}>
       <div className="flex items-center justify-between">
         <button type="button" className="h-11 w-11 rounded-lg text-xl hover:bg-slate-100 disabled:opacity-30" aria-label="Previous month" disabled={curIdx <= startIdx} onClick={() => move(-1)}>‹</button>
-        <div className="font-bold text-brand-900" aria-live="polite">{label}</div>
+        <div className="font-semibold text-brand-900" aria-live="polite">{label}</div>
         <button type="button" className="h-11 w-11 rounded-lg text-xl hover:bg-slate-100 disabled:opacity-30" aria-label="Next month" disabled={curIdx >= startIdx + MONTHS_AHEAD} onClick={() => move(1)}>›</button>
       </div>
-      <div className="mt-2 grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-600">{DOW.map((d) => <div key={d}>{d}</div>)}</div>
+      <div className="mt-2 grid grid-cols-7 gap-1 text-center text-sm font-semibold text-slate-600">{DOW.map((d) => <div key={d}>{d}</div>)}</div>
       <div className="mt-1 grid grid-cols-7 gap-1">
         {cells.map((d, i) => {
           if (!d) return <div key={`e${i}`} />;
@@ -58,7 +58,7 @@ export function DatePicker({ value, onChange, id, invalid }: { value: string; on
           );
         })}
       </div>
-      <p className="mt-2 text-xs text-slate-600">Highlighted dates have availability. Other days have none right now.</p>
+      <p className="mt-2 text-sm text-slate-600">Highlighted dates have availability. Other days have none right now.</p>
     </div>
   );
 }

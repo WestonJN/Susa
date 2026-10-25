@@ -35,7 +35,7 @@ export function LoadAssistant({
     >
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <h2 id="load-assistant-title" className="text-lg font-bold text-brand-900">
+          <h2 id="load-assistant-title" className="text-lg font-semibold text-brand-900">
             Household load assistant
           </h2>
           <button type="button" onClick={onClose} aria-label="Close load assistant" className="h-10 w-10 rounded-lg text-2xl hover:bg-slate-100">
@@ -49,7 +49,7 @@ export function LoadAssistant({
           </p>
           {itemGroups.map((g) => (
             <fieldset key={g.id} className="mb-4 rounded-xl border border-slate-200 px-3 pb-2">
-              <legend className="px-1 text-sm font-bold uppercase tracking-wide text-slate-500">{g.label}</legend>
+              <legend className="px-1 text-sm font-semibold text-slate-600">{g.label}</legend>
               {g.items.map((it) => (
                 <Counter
                   key={it.id}

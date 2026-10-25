@@ -222,7 +222,7 @@ export function QuoteForm() {
   if (status === "done") {
     return (
       <div className="rounded-2xl bg-white p-6 shadow-sm" role="status">
-        <h2 className="text-2xl font-bold text-brand-900">Request received</h2>
+        <h2 className="text-2xl font-semibold text-brand-900">Request received</h2>
         <p className="mt-2 text-slate-700">
           Thanks {clean(s.name, 100).split(" ")[0]}. Our team will check availability and contact you to confirm your final price. Nothing is booked until that is agreed, and you have not been charged.
         </p>
@@ -240,7 +240,7 @@ export function QuoteForm() {
     const wa = whatsappLink(summaryText());
     return (
       <div className="rounded-2xl bg-white p-6 shadow-sm" role="status">
-        <h2 className="text-2xl font-bold text-brand-900">One more step: send your request</h2>
+        <h2 className="text-2xl font-semibold text-brand-900">One more step: send your request</h2>
         <p className="mt-2 text-slate-700">
           {wa || site.email
             ? `Your request has not been sent yet. Use ${wa && site.email ? "a button" : "the button"} below to open ${wa && site.email ? "WhatsApp or your email app" : wa ? "WhatsApp" : "your email app"} with these details filled in, then press send there. Our team will check availability and contact you to confirm your final price. You have not been charged.`
@@ -283,14 +283,14 @@ export function QuoteForm() {
       {quote.status === "needs_review" && (
         <p className="mt-2 text-left text-sm text-amber-700">Our team will check this price before confirming it. {quote.reasons[0]}</p>
       )}
-      <p className="mt-2 text-left text-xs text-slate-500">This is an estimate. It excludes packing and dismantling unless you chose Full service. Our team confirms the final price.</p>
+      <p className="mt-2 text-left text-sm text-slate-600">This is an estimate. It excludes packing and dismantling unless you chose Full service. Our team confirms the final price.</p>
     </>
   );
   const figures = (
     <div>
-      <div className="text-xs uppercase tracking-wide text-slate-500">Estimate{site.vatRegistered ? " incl. VAT" : ""}</div>
-      <div className="text-2xl font-extrabold text-brand-900">{formatZar(quote.total)}</div>
-      <div className="text-xs text-slate-600">50% deposit to confirm: {formatZar(quote.deposit)}</div>
+      <div className="text-sm text-slate-600">Estimate{site.vatRegistered ? " incl. VAT" : ""}</div>
+      <div className="text-3xl font-semibold tracking-tight text-brand-900">{formatZar(quote.total)}</div>
+      <div className="text-sm text-slate-600">50% deposit to confirm: {formatZar(quote.deposit)}</div>
     </div>
   );
 
@@ -313,7 +313,7 @@ export function QuoteForm() {
                   disabled={!done}
                   onClick={() => setStep(i)}
                   aria-label={done ? `${label}, completed. Go back to this step` : label}
-                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
                     done
                       ? "bg-brand-600 text-white hover:bg-brand-700"
                       : current
@@ -329,7 +329,7 @@ export function QuoteForm() {
                     i + 1
                   )}
                 </button>
-                <span className={`mt-2 hidden text-xs font-semibold sm:block ${current ? "text-brand-900" : done ? "text-brand-600" : "text-slate-600"}`}>{label}</span>
+                <span className={`mt-2 hidden text-sm font-semibold sm:block ${current ? "text-brand-900" : done ? "text-brand-600" : "text-slate-600"}`}>{label}</span>
               </li>
             );
           })}
@@ -339,11 +339,11 @@ export function QuoteForm() {
         </p>
       </nav>
 
-      <div className="rounded-2xl bg-white p-4 shadow-sm sm:p-6">
+      <div className="rounded-3xl bg-white p-5 shadow-sm sm:p-8">
         {step === 0 && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-xl font-bold text-brand-900">Where are you moving?</h2>
+              <h2 className="text-2xl font-semibold tracking-tight text-brand-900">Where are you moving?</h2>
               <p className="mt-1 text-sm text-slate-600">We currently move within Johannesburg only. Search for each address, then pick it from the list.</p>
             </div>
             <AddressSearch
@@ -393,23 +393,23 @@ export function QuoteForm() {
 
         {step === 1 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">Choose your vehicle</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-900">Choose your vehicle</h2>
             <fieldset>
               <legend className="sr-only">Vehicle</legend>
               <div className="grid gap-3 sm:grid-cols-2">
                 {vehicles.map((veh) => (
-                  <label key={veh.id} className={`block cursor-pointer rounded-xl border-2 p-4 ${s.vehicleId === veh.id ? "border-brand-600 bg-brand-50" : "border-slate-200"}`}>
+                  <label key={veh.id} className={`block cursor-pointer rounded-2xl border-2 p-5 transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent-600 ${s.vehicleId === veh.id ? "border-brand-600 bg-brand-50" : "border-slate-200 hover:border-slate-300"}`}>
                     <input type="radio" name="vehicle" className="sr-only" checked={s.vehicleId === veh.id} onChange={() => patch({ vehicleId: veh.id })} />
-                    <div className="font-bold text-brand-900">{veh.name}</div>
-                    <div className="text-sm text-slate-500">{veh.tonnage}</div>
+                    <div className="text-lg font-semibold text-brand-900">{veh.name}</div>
+                    <div className="text-sm text-slate-600">{veh.tonnage}</div>
                     <p className="mt-1 text-sm text-slate-700">{veh.bestFor}</p>
-                    <p className="mt-2 text-xs font-medium text-slate-500">{veh.spec}</p>
+                    <p className="mt-2 text-sm text-slate-600">{veh.spec}</p>
                   </label>
                 ))}
               </div>
               {errors.vehicleId && <p role="alert" className="mt-2 text-sm font-medium text-red-700">{errors.vehicleId}</p>}
             </fieldset>
-            <div className="rounded-xl bg-slate-100 p-4">
+            <div className="rounded-2xl bg-slate-100 p-5">
               <div className="font-semibold">Not sure which vehicle fits?</div>
               <p className="mt-1 text-sm text-slate-600">Add your furniture and boxes and we will suggest one.</p>
               <Button variant="ghost" className="mt-2 w-full" onClick={() => setAssistant(true)}>
@@ -421,7 +421,7 @@ export function QuoteForm() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-brand-900">Tell us about the move</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-900">Tell us about the move</h2>
             <fieldset>
               <legend className="mb-2 text-sm font-semibold">Service level</legend>
               <div className="space-y-2">
@@ -445,7 +445,7 @@ export function QuoteForm() {
 
         {step === 3 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">When do you need us?</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-900">When do you need us?</h2>
             <Field label="Date of move" htmlFor="date" error={errors.date} hint="Our team confirms the date with you before anything is booked.">
               <DatePicker id="date" value={s.date} invalid={!!errors.date} onChange={(d) => patch({ date: d })} />
             </Field>
@@ -464,7 +464,7 @@ export function QuoteForm() {
 
         {step === 4 && (
           <div className="space-y-5">
-            <h2 className="text-xl font-bold text-brand-900">Review and request your quote</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-brand-900">Review and request your quote</h2>
             <p className="-mt-3 text-sm text-slate-600">Check your details, then add how we can reach you. This is a request, not a booking, and it is free.</p>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-xl bg-slate-50 p-4 text-sm">
               <dt className="text-slate-500">From</dt><dd>{clean(s.pickup)}</dd>

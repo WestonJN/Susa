@@ -15,7 +15,7 @@ export function DataRequest() {
   const mail = site.email ? `mailto:${site.email}?subject=${encodeURIComponent("Data request")}&body=${encodeURIComponent(text)}` : null;
   return (
     <Container className="max-w-xl py-10 sm:py-14">
-      <h1 className="text-3xl font-extrabold text-brand-900">Data request</h1>
+      <h1 className="text-4xl font-semibold tracking-tight text-brand-900">Data request</h1>
       <p className="mt-3 text-slate-700">Ask us to delete, correct or send you a copy of the personal information we hold about you. Fill in the form below, then send the message from your own email or WhatsApp. We reply within 30 days. We may need to confirm it is you, and we may have to keep records the law requires, such as invoices.</p>
       <div className="mt-6 space-y-4">
         <Field label="What do you need?" htmlFor="kind">
