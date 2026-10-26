@@ -36,6 +36,6 @@
 ## Added with complex moves, repeat plans and the launch offer
 - [ ] Confirm the in-complex rates (`complexRates`) against two or three real jobs
 - [ ] Attorney check of the launch offer and repeat plan terms (`/terms/`)
-- [ ] Decide how to track launch bookings and switch the offer off at your limit (`VITE_PROMO_ENABLED=false`)
+- [ ] Decide how to track launch bookings and switch the offer off at your limit (repository variable `PROMO_ENABLED=false`)
 - [ ] Resubmit the sitemap in Search Console and Bing after deploy
 - [ ] Backend: accept `kind`, `complex`, `repeat` and `estimate.discount`

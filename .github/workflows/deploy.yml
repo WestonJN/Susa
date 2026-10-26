@@ -74,6 +74,8 @@ jobs:
           VITE_VAT_NUMBER: ${{ vars.VAT_NUMBER }}
           VITE_BUSINESS_ADDRESS: ${{ vars.BUSINESS_ADDRESS }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ vars.GOOGLE_MAPS_API_KEY }}
+          VITE_PROMO_ENABLED: ${{ vars.PROMO_ENABLED }}
+          VITE_PROMO_ENDS: ${{ vars.PROMO_END_DATE }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
