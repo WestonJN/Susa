@@ -25,6 +25,8 @@ export function AreaPage({ area }: { area: Area }) {
         <ul className="space-y-3 text-slate-700">
           <li><a className="font-semibold text-brand-600 underline" href={href("/services/home-moving/")}>Home moving and furniture removals</a>: a bakkie or bakkie with trailer, with a crew if you want one.</li>
           <li><a className="font-semibold text-brand-600 underline" href={href("/services/truck-hire/")}>Truck transport and furniture delivery</a>: single deliveries, donation runs and large items.</li>
+          <li><a className="font-semibold text-brand-600 underline" href={href("/services/complex-moves/")}>Moving within a complex</a>: a lower, time-based price when you stay inside one complex or estate.</li>
+          <li><a className="font-semibold text-brand-600 underline" href={href("/services/repeat-deliveries/")}>Repeat deliveries</a>: the same run every week, fortnight or month, with a loyalty discount.</li>
         </ul>
         <div className="mt-6"><LinkButton href={href("/get-quote/")}>Get a quote</LinkButton></div>
         <p className="mt-2 text-sm text-slate-600">Free to request. Not a booking.</p>

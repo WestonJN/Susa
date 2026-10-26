@@ -32,3 +32,10 @@
 - [ ] Backend v1: endpoint that stores requests and emails you and the customer
 - [ ] Approval queue, console, agents, WhatsApp Business API, online deposits
 - [ ] Return the IP-address "security and abuse prevention" statement to the privacy notice once the backend exists
+
+## Added with complex moves, repeat plans and the launch offer
+- [ ] Confirm the in-complex rates (`complexRates`) against two or three real jobs
+- [ ] Attorney check of the launch offer and repeat plan terms (`/terms/`)
+- [ ] Decide how to track launch bookings and switch the offer off at your limit (`VITE_PROMO_ENABLED=false`)
+- [ ] Resubmit the sitemap in Search Console and Bing after deploy
+- [ ] Backend: accept `kind`, `complex`, `repeat` and `estimate.discount`

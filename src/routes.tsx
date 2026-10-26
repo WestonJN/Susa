@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { site } from "./config/site";
 import { areas } from "./content/areas";
-import { breadcrumbLd, organizationLd, serviceLd, websiteLd, type PageMeta } from "./lib/seo";
-import { Home } from "./pages/Home";
+import { breadcrumbLd, faqLd, organizationLd, serviceLd, websiteLd, type PageMeta } from "./lib/seo";
+import { Home, faqs } from "./pages/Home";
 import { QuotePage } from "./pages/QuotePage";
 import { ServicePage, services } from "./pages/Service";
 import { AreaPage } from "./pages/AreaPage";
@@ -25,13 +25,13 @@ export const routes: Route[] = [
     description: site.description,
     priority: 1,
     changefreq: "weekly",
-    jsonLd: [organizationLd(site), websiteLd(site)],
+    jsonLd: [organizationLd(site), websiteLd(site), faqLd(faqs)],
     element: <Home />,
   },
   {
     path: "/get-quote/",
-    title: `Instant Moving Quote in Johannesburg | ${site.name}`,
-    description: "Enter your Johannesburg addresses, choose a bakkie or bakkie with trailer and see your moving estimate build up. Free to request, and not a booking.",
+    title: `Get a Moving Quote in Johannesburg | ${site.name}`,
+    description: "Get a moving estimate in Johannesburg: a home move, a move within a complex or repeat deliveries. See your price build up. Free to request, not a booking.",
     priority: 0.9,
     changefreq: "monthly",
     jsonLd: [crumbs("Get a quote", "/get-quote/")],

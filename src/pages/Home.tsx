@@ -1,6 +1,8 @@
 import { areas } from "../content/areas";
 import { href } from "../lib/url";
 import { Container, LinkButton, Section } from "../components/ui";
+import { complexRates } from "../lib/catalog";
+import { formatZar } from "../lib/pricing";
 import { FleetShowcase } from "../components/fleet/FleetShowcase";
 import { ComboArt } from "../components/fleet/Vehicles";
 import { photo } from "../components/fleet/photos";
@@ -12,7 +14,7 @@ const steps = [
   { t: "Send your request", d: "Our team checks availability and confirms your final price before anything is booked. Asking for a quote is free." },
 ];
 
-const faqs = [
+export const faqs = [
   { q: "Is the online price final?", a: "No. It is an estimate. Our team confirms availability and the final price before your booking is locked in. Asking for a quote is free and you are not charged." },
   { q: "What happens after I send my request?", a: "Once we receive it, our team checks availability and contacts you to confirm the final price. Your move is booked only when that is agreed. Depending on how you send it, you may need to press send in WhatsApp or your email app." },
   { q: "Which days do you move?", a: "Online bookings are currently open on the highlighted dates in the quote calendar. Our team confirms your date and arrival time with you before anything is booked." },
@@ -20,6 +22,8 @@ const faqs = [
   { q: "Which vehicles do you use?", a: "One 1.3 ton dropside bakkie, on its own or towing a closed box trailer that is specifically designed for furniture transport." },
   { q: "How do I know which vehicle I need?", a: "Use the load assistant. Add your furniture and boxes and it suggests the bakkie or the bakkie with trailer, and how many helpers to add." },
   { q: "Does the quote include packing?", a: "Packing, wrapping and dismantling are included only in the Full service option. If you want them without Full service, ask our team when you send your request." },
+  { q: "Can I get a cheaper price for a move within my complex?", a: "Yes. If you are moving between two units in the same complex or estate, choose \"Within a complex\" in the quote form. You enter one address and the size of your move, and the price is based on the time the job takes, not distance." },
+  { q: "How do repeat deliveries work?", a: "If you deliver the same run every week, fortnight or month, set it up as a repeat delivery plan. You pick the weekday, Monday to Friday, and get a loyalty discount of 10% for weekly runs or 5% for fortnightly runs. Plans run for a minimum of 3 months and are invoiced monthly in advance after we confirm." },
   { q: "Do you move offices as well as homes?", a: "Yes, small offices and business deliveries that fit the bakkie or the bakkie with trailer. Bigger loads can be split over several trips. You use the same quote form." },
   { q: "Do you move outside Johannesburg?", a: "Not yet. We currently move within the City of Johannesburg only." },
   { q: "How do you handle my personal information?", a: "We collect only what we need to prepare your quote and plan your move, and we handle it under POPIA. Read the privacy notice for details and your rights." },
@@ -85,7 +89,23 @@ export function Home() {
 
       <FleetShowcase />
 
-      <Section id="areas" title="Where we move" intro="We currently move homes and small offices within Johannesburg only. Access rules differ from building to building, so we share what to expect." tone="white">
+      <Section title="Other ways we help" tone="white">
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { to: "/services/complex-moves/", t: "Moving within a complex", d: `Between two units in the same complex or estate. Priced by time with no distance, from ${formatZar(complexRates.minCharge)}.` },
+            { to: "/services/repeat-deliveries/", t: "Repeat deliveries", d: "The same run every week, fortnight or month, Monday to Friday, with a loyalty discount and monthly invoicing." },
+            { to: "/services/truck-hire/", t: "Truck transport", d: "One delivery, a donation run or a large item. A bakkie and driver for your route." },
+          ].map((c) => (
+            <a key={c.to} href={href(c.to)} className="group block rounded-2xl bg-slate-50 p-6 transition-colors hover:bg-slate-100">
+              <h3 className="text-lg font-semibold text-brand-900">{c.t}</h3>
+              <p className="mt-2 text-slate-600">{c.d}</p>
+              <span className="mt-4 inline-flex min-h-11 items-center font-semibold text-brand-600 group-hover:underline">Learn more <span aria-hidden="true" className="ml-1">&rsaquo;</span></span>
+            </a>
+          ))}
+        </div>
+      </Section>
+
+      <Section id="areas" title="Where we move" intro="We currently move homes and small offices within Johannesburg only. Access rules differ from building to building, so we share what to expect.">
         <ul className="flex flex-wrap gap-2">
           {areas[0]?.nearby.map((n) => (
             <li key={n} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700">{n}</li>
@@ -96,7 +116,7 @@ export function Home() {
         </p>
       </Section>
 
-      <Section title="Common questions">
+      <Section title="Common questions" tone="white">
         <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
           {faqs.slice(0, FIRST_FAQS).map((f) => <Faq key={f.q} f={f} />)}
           <details className="group">

@@ -3,6 +3,7 @@ import { site } from "../config/site";
 import { areas } from "../content/areas";
 import { href } from "../lib/url";
 import { Container, LinkButton } from "./ui";
+import { PromoBar } from "./Promo";
 
 function Logo() {
   return (
@@ -20,6 +21,8 @@ function Logo() {
 
 const nav = [
   { label: "Home moving", to: "/services/home-moving/" },
+  { label: "Within a complex", to: "/services/complex-moves/" },
+  { label: "Repeat deliveries", to: "/services/repeat-deliveries/" },
   { label: "Truck transport", to: "/services/truck-hire/" },
 ] as const;
 
@@ -35,10 +38,11 @@ export function Layout({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:p-3">
         Skip to content
       </a>
+      <PromoBar />
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <Container className="flex h-16 items-center justify-between gap-3">
           <Logo />
-          <nav aria-label="Main" className="hidden items-center gap-6 md:flex">
+          <nav aria-label="Main" className="hidden items-center gap-5 lg:flex">
             {nav.map((n) => (
               <a key={n.to} href={href(n.to)} className="inline-flex min-h-11 items-center text-sm font-medium text-slate-700 hover:text-brand-600">
                 {n.label}
@@ -49,7 +53,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <LinkButton href={href("/get-quote/")} className="min-h-10 px-4 text-sm">
               Get a quote
             </LinkButton>
-            <details className="relative md:hidden">
+            <details className="relative lg:hidden">
               <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-lg border border-slate-300" aria-label="Open menu">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path d="M4 7h16M4 12h16M4 17h16" />
@@ -106,6 +110,8 @@ export function Layout({ children }: { children: ReactNode }) {
             <div className="font-semibold text-white">Quotes and policies</div>
             <ul className="mt-2 text-sm">
               <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/get-quote/")}>Get a quote</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/services/complex-moves/")}>Moving within a complex</a></li>
+              <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/services/repeat-deliveries/")}>Repeat deliveries</a></li>
               <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/drive-with-us/")}>Drive with us (coming soon)</a></li>
               <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/privacy/")}>Privacy notice (POPIA)</a></li>
               <li><a className="flex min-h-11 items-center hover:underline sm:min-h-9" href={href("/terms/")}>Terms of service</a></li>

@@ -78,6 +78,48 @@ export const rates = {
   heavyItemKg: 60,
 } as const;
 
+/**
+ * Moving within one complex or estate: no driving distance and no long positioning trip, so no big callout.
+ * Priced by time. All figures are working assumptions to confirm against real jobs.
+ */
+export const complexRates = {
+  callout: 250,
+  /** Vehicle and driver, per billable hour. */
+  vehicleHourly: 100,
+  /** Per mover, per hour (the driver is covered by the vehicle rate). */
+  crewHourly: 70,
+  minHours: 2,
+  baseHours: 0.5,
+  hoursPerM3: 0.3,
+  hoursPerFloor: 0.25,
+  hoursPerExtraTrip: 0.25,
+  /** Extra time for a longer carry between the two units. */
+  walkHours: { same: 0, across: 0.25, far: 0.5 },
+  /** Hard floor: callout plus the minimum hours of vehicle time. */
+  minCharge: 450,
+} as const;
+export type WalkId = keyof typeof complexRates.walkHours;
+export const walkOptions: readonly { id: WalkId; label: string; hint: string }[] = [
+  { id: "same", label: "Same block or building", hint: "A short carry, such as next door or one floor up" },
+  { id: "across", label: "Across the complex", hint: "A few minutes' walk or a short drive inside the gate" },
+  { id: "far", label: "Far side of a large estate", hint: "A long walk or a longer drive inside the estate" },
+] as const;
+
+/** Rough load sizes for people who do not want to list every item. */
+export const complexSizes: readonly { id: string; label: string; hint: string; m3: number }[] = [
+  { id: "few", label: "A few items", hint: "A bed or a sofa and some boxes", m3: 3 },
+  { id: "one-bed", label: "One-bedroom flat", hint: "Bed, sofa, table, fridge and boxes", m3: 6 },
+  { id: "two-bed", label: "Two-bedroom flat", hint: "Two bedrooms, lounge, kitchen and boxes", m3: 12 },
+  { id: "three-bed", label: "Three-bedroom home", hint: "A full family home", m3: 18 },
+] as const;
+
+export const repeatFrequencies = [
+  { id: "weekly", label: "Every week", runsPerMonth: 4, discount: 10 },
+  { id: "fortnightly", label: "Every two weeks", runsPerMonth: 2, discount: 5 },
+  { id: "monthly", label: "Once a month", runsPerMonth: 1, discount: 0 },
+] as const;
+export type RepeatFrequency = (typeof repeatFrequencies)[number]["id"];
+
 /** Fuel plus maintenance per driven km. Litres per 100 km and maintenance per km are working assumptions. */
 export const runningCostPerKm = (litresPer100: number, maintenancePerKm: number) =>
   (litresPer100 / 100) * rates.dieselPricePerLitre + maintenancePerKm;
@@ -303,8 +345,12 @@ export function recommendLoad(items: Record<string, number>): LoadRecommendation
     volume += it.m3 * qty;
     if (it.heavy) heavy += qty;
   }
-  volume = Math.round(volume * 100) / 100;
-  if (volume === 0) return { volumeM3: 0, vehicleId: null, trips: 1, helpers: 0, loadKg: 0 };
+  return recommendForVolume(Math.round(volume * 100) / 100, heavy);
+}
+
+/** Same recommendation from a known volume (m³) and number of heavy items. */
+export function recommendForVolume(volume: number, heavy = 0): LoadRecommendation {
+  if (volume <= 0) return { volumeM3: 0, vehicleId: null, trips: 1, helpers: 0, loadKg: 0 };
 
   const loadKg = estimateLoadKg(volume, heavy);
   const fit = vehicles.find((v) => v.capacityM3 * rates.loadEfficiency >= volume && v.maxLoadKg >= loadKg);

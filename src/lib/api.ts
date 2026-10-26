@@ -9,6 +9,12 @@ import { site } from "../config/site";
 export interface QuoteRequestV1 {
   schemaVersion: 1;
   idempotencyKey: string;
+  /** Type of request. Older clients omit it, which means "standard". */
+  kind?: "standard" | "complex" | "repeat";
+  /** Moves within one complex: the units and the carry distance. */
+  complex?: { unitFrom: string; unitTo: string; walk: string };
+  /** Repeat delivery plans. */
+  repeat?: { frequency: string; goods: string; runsPerMonth: number; monthlyEstimate: number };
   route: {
     pickup: string;
     dropoff: string;
@@ -27,7 +33,7 @@ export interface QuoteRequestV1 {
     items: Record<string, number>;
   };
   schedule: { date: string; window: string };
-  estimate: { total: number; status: string; confidence: number; reasons: string[] };
+  estimate: { total: number; status: string; confidence: number; reasons: string[]; discount?: { label: string; amount: number } | null };
   contact: { name: string; phone: string; email: string | null };
   consent: { privacyNoticeVersion: string; acceptedAt: string };
   /** Honeypot: must be empty. */

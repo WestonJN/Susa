@@ -122,6 +122,14 @@ export function Terms() {
         <H>Deposit</H>
         <p>A 50% deposit confirms your booking once we have agreed the final price with you. We tell you how to pay when we confirm. The balance is due on the day of the move, unless we agree otherwise in writing.</p>
       </section>
+      <section id="launch-offer">
+        <H>Launch offer</H>
+        <p>The launch offer takes 20% off the price of a home move or a move within a complex, up to R500 off one booking. It applies automatically in your estimate. It is for new customers, for bookings confirmed with the deposit paid by 31 December 2026. The move can be on a later date. We may end the offer sooner if we reach our limit of launch bookings, and we will not change the price of a booking already confirmed. It cannot be combined with a repeat delivery plan or with any other discount, and it has no cash value. The final price is always confirmed by our team before your booking is locked in.</p>
+      </section>
+      <section id="repeat-deliveries">
+        <H>Repeat delivery plans</H>
+        <p>A repeat delivery plan covers the same route on a regular weekday, Monday to Friday, weekly, fortnightly or monthly. A plan starts only once our team confirms it. It runs for a minimum of 3 months and the price is held for that time. We invoice each month in advance by EFT. You can skip or move a run if you tell us at least two business days before it, and after the first 3 months you can cancel on 20 business days' notice. A plan cannot run for longer than 24 months without being renewed. Plan discounts are 10% for weekly runs and 5% for fortnightly runs.</p>
+      </section>
       <section>
         <H>Changes and cancellations</H>
         <p>See our <A to="/cancellations/">cancellation and refund policy</A>.</p>
@@ -147,6 +155,10 @@ export function Cancellations() {
         <p>Tell us as early as you can, using the contact details on this website. If you cancel or move your booking at least 48 hours before the start time, you can move the deposit to another available date at no cost, or have it refunded. If you cancel with less than 48 hours' notice, or the crew cannot start because access or the load is not ready, the deposit is not refunded.</p>
       </section>
       <section>
+        <H>Repeat delivery plans</H>
+        <p>Plans are cancelled on 20 business days' notice after the first 3 months, and single runs can be skipped or moved with two business days' notice. See the <A to="/terms/#repeat-deliveries">repeat delivery terms</A>.</p>
+      </section>
+      <section>
         <H>Refunds</H>
         <p>Refunds go back to the account you paid from, normally within 7 working days. The deposit is 50% of the confirmed price. If we cancel or cannot do your move, we refund everything you have paid and help you find another date.</p>
       </section>
@@ -165,6 +177,10 @@ export function Cookies() {
       <section>
         <H>What your browser may still do</H>
         <p>Like any website, our host (GitHub Pages) and the services that power the address search receive technical information such as your IP address when your browser contacts them. See the <A to="/privacy/">privacy notice</A> for who they are.</p>
+      </section>
+      <section>
+        <H>What this site remembers in your browser</H>
+        <p>While the launch offer runs, your browser remembers that you have seen or hidden the offer message, so we do not show it again and again. This stays in your browser, is not a cookie and is never sent to us.</p>
       </section>
       <section>
         <H>If this changes</H>

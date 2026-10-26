@@ -102,3 +102,11 @@ export function serviceLd(site: Site, name: string, description: string, path: s
     areaServed: { "@type": "AdministrativeArea", name: area },
   };
 }
+
+export function faqLd(items: { q: string; a: string }[]): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((i) => ({ "@type": "Question", name: i.q, acceptedAnswer: { "@type": "Answer", text: i.a } })),
+  };
+}

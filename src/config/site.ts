@@ -9,7 +9,7 @@ export const site = {
   name: (env.VITE_SITE_NAME as string | undefined) ?? "Susa",
   tagline: "Furniture removals and truck transport in Johannesburg",
   description:
-    "Get an instant estimate for furniture removals and truck transport in Johannesburg. Choose a bakkie or bakkie with trailer, then request a free quote.",
+    "Instant estimates for furniture removals, moves within a complex and repeat deliveries in Johannesburg. Bakkie or bakkie with trailer. Free quote request.",
   url: (((env.VITE_SITE_URL as string | undefined) || "https://www.example.co.za").replace(/\/$/, "") + String(env.BASE_URL).replace(/\/$/, "")),
   locale: "en_ZA",
   phone: (env.VITE_PHONE as string | undefined) || "+27 60 988 3937",
@@ -25,6 +25,8 @@ export const site = {
   hours: "Sunday to Thursday 07:00 to 17:00, Friday 07:00 to 16:00, closed Saturday",
   /** MVP: moves are only taken on these weekdays (0 = Sunday). */
   bookingDays: [0] as readonly number[],
+  /** Repeat delivery plans can start on any weekday (Monday to Friday). */
+  repeatDays: [1, 2, 3, 4, 5] as readonly number[],
   vatRegistered: env.VITE_VAT_REGISTERED === "true",
   vatRate: 0.15,
   gscVerification: (env.VITE_GSC_VERIFICATION as string | undefined) ?? "",

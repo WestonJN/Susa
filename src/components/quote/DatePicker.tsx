@@ -7,8 +7,8 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const iso = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
 const MONTHS_AHEAD = 5;
 
-/** Month calendar. Only the weekdays in site.bookingDays can be picked; every other day shows as no availability. */
-export function DatePicker({ value, onChange, id, invalid }: { value: string; onChange: (v: string) => void; id: string; invalid?: boolean }) {
+/** Month calendar. Only the weekdays in `days` (default site.bookingDays) can be picked; every other day shows as no availability. */
+export function DatePicker({ value, onChange, id, invalid, days: openDays = site.bookingDays }: { value: string; onChange: (v: string) => void; id: string; invalid?: boolean; days?: readonly number[] }) {
   const [today, setToday] = useState("");
   const [view, setView] = useState<{ y: number; m: number } | null>(null);
   useEffect(() => {
@@ -38,7 +38,7 @@ export function DatePicker({ value, onChange, id, invalid }: { value: string; on
         {cells.map((d, i) => {
           if (!d) return <div key={`e${i}`} />;
           const date = iso(view.y, view.m, d);
-          const ok = isBookableDay(date, today, site.bookingDays);
+          const ok = isBookableDay(date, today, openDays);
           const selected = date === value;
           const nice = new Intl.DateTimeFormat("en-ZA", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`));
           return (
